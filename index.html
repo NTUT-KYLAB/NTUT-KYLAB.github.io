@@ -4,18 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>System Analysis & Control Lab — Taipei Tech</title>
-<meta name="description" content="國立臺北科技大學 系統分析與控制實驗室 — 專注於無人機、自走車、智慧控制研究">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>⚙️</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<meta name="description" content="國立臺北科技大學 系統分析與控制實驗室">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🤖</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
+<!-- ====== CURSOR GLOW ====== -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
 <!-- ====== NAV ====== -->
 <nav id="navbar">
   <div class="nav-brand">
-    <div class="logo-text">System Analysis<br><span>&</span> Control Lab</div>
-    <span class="nav-badge">Taipei Tech</span>
+    <div class="nav-logo-box">
+      <span class="nav-logo-icon">⚙️</span>
+    </div>
+    <div class="logo-text">SAC <span>Lab</span></div>
   </div>
   <ul class="nav-links">
     <li><a href="#hero" class="active">Home</a></li>
@@ -32,212 +37,269 @@
 
 <!-- ====== HERO ====== -->
 <section class="hero" id="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <!-- 可替換為實際照片：取消下方註解，並將圖片放入 images/ 資料夾 -->
-  <!-- <div class="hero-photo"><img src="images/hero-bg.jpg" alt="Lab Photo"></div> -->
+  <div class="hero-particles" id="particles"></div>
+  <div class="hero-grid-bg"></div>
+  <div class="hero-deco">
+    <span class="float-icon f1">🛸</span>
+    <span class="float-icon f2">🔧</span>
+    <span class="float-icon f3">💡</span>
+    <span class="float-icon f4">🚀</span>
+    <span class="float-icon f5">⚡</span>
+    <span class="float-icon f6">🎯</span>
+    <div class="orbit-ring ring1"><div class="orbit-dot"></div></div>
+    <div class="orbit-ring ring2"><div class="orbit-dot"></div></div>
+  </div>
+
   <div class="hero-content">
-    <div class="hero-label">National Taipei University of Technology</div>
-    <h1>System Analysis<br>& <span class="highlight">Control Lab</span></h1>
-    <div class="hero-subtitle-zh">系 統 分 析 與 控 制 實 驗 室</div>
+    <div class="hero-chip">
+      <span class="chip-dot"></span>
+      National Taipei University of Technology
+    </div>
+    <h1>
+      <span class="line1">System Analysis</span>
+      <span class="line2">& <span class="gradient-text">Control Lab</span></span>
+    </h1>
+    <p class="hero-sub">系統分析與控制實驗室</p>
     <p class="hero-desc">
-      專注於無人機、自走車、機器人控制與系統分析研究，<br>
-      結合理論與實務，培育下一代控制工程人才。
+      專注於無人機 🛸、自走車 🚗、機器人控制 🤖 與系統分析研究<br>
+      結合理論與實務，培育下一代控制工程人才 ✨
     </p>
     <div class="hero-actions">
-      <a href="#projects" class="btn btn-primary">探索研究專案</a>
-      <a href="#team" class="btn btn-outline">認識我們</a>
+      <a href="#projects" class="btn btn-glow">
+        <span>探索專案</span>
+        <span class="btn-arrow">→</span>
+      </a>
+      <a href="#team" class="btn btn-soft">認識我們 👋</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">3+</div>
+        <div class="stat-label">研究領域</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-num">10+</div>
+        <div class="stat-label">研究成員</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-num">5+</div>
+        <div class="stat-label">獲獎紀錄</div>
+      </div>
     </div>
   </div>
-  <div class="hero-scroll">
-    <span>Scroll</span>
-    <div class="arrow"></div>
+
+  <div class="hero-scroll" onclick="document.getElementById('research').scrollIntoView({behavior:'smooth'})">
+    <div class="scroll-line"></div>
+    <span>SCROLL</span>
   </div>
 </section>
 
 <!-- ====== RESEARCH ====== -->
 <section class="research" id="research">
   <div class="section-header reveal">
-    <div class="section-tag">Research Areas</div>
+    <div class="section-badge">🔬 Research Areas</div>
     <h2 class="section-title">研究領域</h2>
     <p class="section-desc">我們的研究涵蓋多個前沿控制與系統分析領域</p>
   </div>
   <div class="research-grid">
-
-    <div class="research-card reveal">
-      <div class="card-icon blue">🛸</div>
+    <div class="research-card reveal card-hover" data-color="cyan">
+      <div class="card-glow"></div>
+      <div class="card-icon-wrap cyan">
+        <span>🛸</span>
+      </div>
       <h3>無人機系統</h3>
       <p>研究多旋翼無人機的飛行控制、路徑規劃與自主導航，開發穩定且高效的飛控演算法。</p>
+      <div class="card-footer">
+        <span class="card-tag">Drone Control</span>
+        <span class="card-arrow">→</span>
+      </div>
     </div>
-
-    <div class="research-card reveal">
-      <div class="card-icon purple">🚗</div>
+    <div class="research-card reveal card-hover" data-color="purple">
+      <div class="card-glow"></div>
+      <div class="card-icon-wrap purple">
+        <span>🚗</span>
+      </div>
       <h3>自走車技術</h3>
       <p>結合感測融合與控制理論，實現自走車的精確定位、避障與自主移動能力。</p>
+      <div class="card-footer">
+        <span class="card-tag">Autonomous Vehicle</span>
+        <span class="card-arrow">→</span>
+      </div>
     </div>
-
-    <div class="research-card reveal">
-      <div class="card-icon green">🤖</div>
+    <div class="research-card reveal card-hover" data-color="orange">
+      <div class="card-glow"></div>
+      <div class="card-icon-wrap orange">
+        <span>🤖</span>
+      </div>
       <h3>智慧控制</h3>
       <p>運用模糊控制、類神經網路等智慧控制方法，解決複雜非線性系統的控制問題。</p>
+      <div class="card-footer">
+        <span class="card-tag">Intelligent Control</span>
+        <span class="card-arrow">→</span>
+      </div>
     </div>
-
   </div>
 </section>
 
 <!-- ====== PROJECTS ====== -->
 <section class="projects" id="projects">
   <div class="section-header reveal">
-    <div class="section-tag">Featured Projects</div>
+    <div class="section-badge">📂 Featured Projects</div>
     <h2 class="section-title">研究專案</h2>
     <p class="section-desc">展示我們近期的代表性研究成果</p>
   </div>
   <div class="projects-grid">
-
-    <div class="project-card reveal">
-      <div class="project-img gradient-blue">
-        <!-- 替換為實際圖片：<img src="images/project-01.jpg" alt="..."> -->
-        <div class="number">01</div>
-        <div class="overlay"></div>
+    <div class="project-card reveal card-hover">
+      <div class="proj-header">
+        <span class="proj-num">01</span>
+        <span class="proj-emoji">🎮</span>
       </div>
-      <div class="project-body">
-        <div class="project-tag">Drone Control</div>
-        <h3>多旋翼無人機穩定控制系統</h3>
-        <p>開發基於模糊 PID 控制器的四旋翼無人機姿態穩定系統，提升飛行穩定性與抗干擾能力。</p>
+      <h3>多旋翼無人機穩定控制系統</h3>
+      <p>開發基於模糊 PID 控制器的四旋翼無人機姿態穩定系統，提升飛行穩定性與抗干擾能力。</p>
+      <div class="proj-tags">
+        <span>Drone</span><span>PID</span><span>Fuzzy</span>
       </div>
     </div>
-
-    <div class="project-card reveal">
-      <div class="project-img gradient-purple">
-        <div class="number">02</div>
-        <div class="overlay"></div>
+    <div class="project-card reveal card-hover">
+      <div class="proj-header">
+        <span class="proj-num">02</span>
+        <span class="proj-emoji">📷</span>
       </div>
-      <div class="project-body">
-        <div class="project-tag">Autonomous Vehicle</div>
-        <h3>視覺導引自走車系統</h3>
-        <p>利用影像辨識與深度學習技術，實現自走車的即時環境感知與自主路徑追蹤。</p>
-      </div>
-    </div>
-
-    <div class="project-card reveal">
-      <div class="project-img gradient-green">
-        <div class="number">03</div>
-        <div class="overlay"></div>
-      </div>
-      <div class="project-body">
-        <div class="project-tag">System Analysis</div>
-        <h3>非線性系統穩定性分析</h3>
-        <p>研究非線性動態系統的 Lyapunov 穩定性理論，並應用於實際機電系統。</p>
+      <h3>視覺導引自走車系統</h3>
+      <p>利用影像辨識與深度學習技術，實現自走車的即時環境感知與自主路徑追蹤。</p>
+      <div class="proj-tags">
+        <span>Vision</span><span>Deep Learning</span><span>AGV</span>
       </div>
     </div>
-
+    <div class="project-card reveal card-hover">
+      <div class="proj-header">
+        <span class="proj-num">03</span>
+        <span class="proj-emoji">📐</span>
+      </div>
+      <h3>非線性系統穩定性分析</h3>
+      <p>研究非線性動態系統的 Lyapunov 穩定性理論，並應用於實際機電系統。</p>
+      <div class="proj-tags">
+        <span>Lyapunov</span><span>Nonlinear</span><span>Stability</span>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- ====== TEAM ====== -->
 <section class="team" id="team">
   <div class="section-header reveal">
-    <div class="section-tag">Our Team</div>
+    <div class="section-badge">👥 Our Team</div>
     <h2 class="section-title">實驗室成員</h2>
     <p class="section-desc">由指導教授帶領碩博士生組成的研究團隊</p>
   </div>
   <div class="team-grid">
-
-    <div class="team-card reveal">
-      <div class="team-avatar">
-        <!-- 替換為實際照片：<img src="images/professor.jpg" alt="教授"> -->
-        <span>指導</span>
+    <div class="team-card reveal card-hover">
+      <div class="team-avatar-wrap">
+        <div class="team-avatar prof">👨‍🏫</div>
+        <div class="avatar-ring"></div>
       </div>
       <h4>王○○ 教授</h4>
       <p class="role">Professor / Advisor</p>
     </div>
-
-    <div class="team-card reveal">
-      <div class="team-avatar grad-purple">
-        <span>博</span>
+    <div class="team-card reveal card-hover">
+      <div class="team-avatar-wrap">
+        <div class="team-avatar phd">🎓</div>
+        <div class="avatar-ring"></div>
       </div>
       <h4>博士班研究生</h4>
       <p class="role">Ph.D. Student</p>
     </div>
-
-    <div class="team-card reveal">
-      <div class="team-avatar grad-green">
-        <span>碩</span>
+    <div class="team-card reveal card-hover">
+      <div class="team-avatar-wrap">
+        <div class="team-avatar master">📚</div>
+        <div class="avatar-ring"></div>
       </div>
       <h4>碩士班研究生</h4>
       <p class="role">Master's Student</p>
     </div>
-
-    <div class="team-card reveal">
-      <div class="team-avatar grad-gold">
-        <span>專</span>
+    <div class="team-card reveal card-hover">
+      <div class="team-avatar-wrap">
+        <div class="team-avatar undergrad">💡</div>
+        <div class="avatar-ring"></div>
       </div>
       <h4>專題生</h4>
       <p class="role">Undergraduate Researcher</p>
     </div>
-
   </div>
 </section>
 
 <!-- ====== AWARDS ====== -->
 <section class="awards" id="awards">
   <div class="section-header reveal">
-    <div class="section-tag">Achievements</div>
+    <div class="section-badge">🏆 Achievements</div>
     <h2 class="section-title">榮譽與獲獎</h2>
     <p class="section-desc">實驗室歷年來的重要獲獎與成就</p>
   </div>
   <div class="awards-list">
-
-    <div class="award-item reveal">
-      <div class="award-year">2025</div>
-      <div class="award-dot"></div>
-      <div class="award-info">
+    <div class="award-item reveal card-hover">
+      <div class="award-icon gold">🥇</div>
+      <div class="award-body">
         <h4>全國智慧機器人競賽 — 冠軍</h4>
-        <p>自走車組別 / 教育部主辦</p>
+        <p>2025 · 自走車組別 · 教育部主辦</p>
       </div>
+      <div class="award-year-badge">2025</div>
     </div>
-
-    <div class="award-item reveal">
-      <div class="award-year">2024</div>
-      <div class="award-dot"></div>
-      <div class="award-info">
+    <div class="award-item reveal card-hover">
+      <div class="award-icon silver">🥈</div>
+      <div class="award-body">
         <h4>國際無人機創新應用競賽 — 銀獎</h4>
-        <p>自主飛行組別 / IEEE 協辦</p>
+        <p>2024 · 自主飛行組別 · IEEE 協辦</p>
       </div>
+      <div class="award-year-badge">2024</div>
     </div>
-
-    <div class="award-item reveal">
-      <div class="award-year">2024</div>
-      <div class="award-dot"></div>
-      <div class="award-info">
+    <div class="award-item reveal card-hover">
+      <div class="award-icon star">⭐</div>
+      <div class="award-body">
         <h4>科技部大專生研究計畫 — 優等</h4>
-        <p>控制工程領域</p>
+        <p>2024 · 控制工程領域</p>
       </div>
+      <div class="award-year-badge">2024</div>
     </div>
-
-    <div class="award-item reveal">
-      <div class="award-year">2023</div>
-      <div class="award-dot"></div>
-      <div class="award-info">
+    <div class="award-item reveal card-hover">
+      <div class="award-icon medal">🎖️</div>
+      <div class="award-body">
         <h4>TDK 盃機器人競賽 — 佳作</h4>
-        <p>自動化控制組</p>
+        <p>2023 · 自動化控制組</p>
       </div>
+      <div class="award-year-badge">2023</div>
     </div>
-
   </div>
 </section>
 
 <!-- ====== FOOTER ====== -->
 <footer id="contact">
-  <div class="footer-content">
-    <div class="footer-brand">System Analysis & Control Lab</div>
-    <p>國立臺北科技大學 · National Taipei University of Technology</p>
-    <div class="divider"></div>
-    <p>
-      地址：106 台北市大安區忠孝東路三段1號<br>
-      Email：<a href="mailto:lab@example.ntut.edu.tw">lab@example.ntut.edu.tw</a>
-    </p>
-    <p class="copyright">© 2025 SAC Lab. All rights reserved.</p>
+  <div class="footer-top">
+    <div class="footer-brand-area">
+      <div class="footer-logo-box"><span>⚙️</span></div>
+      <div>
+        <div class="footer-brand">SAC Lab</div>
+        <p>系統分析與控制實驗室</p>
+      </div>
+    </div>
+    <div class="footer-info">
+      <div class="footer-item">
+        <span class="fi-icon">📍</span>
+        <span>106 台北市大安區忠孝東路三段1號</span>
+      </div>
+      <div class="footer-item">
+        <span class="fi-icon">✉️</span>
+        <a href="mailto:lab@example.ntut.edu.tw">lab@example.ntut.edu.tw</a>
+      </div>
+      <div class="footer-item">
+        <span class="fi-icon">🏫</span>
+        <span>National Taipei University of Technology</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Made with 💛 by SAC Lab © 2025</p>
   </div>
 </footer>
 
