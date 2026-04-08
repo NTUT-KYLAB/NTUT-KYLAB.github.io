@@ -1,38 +1,76 @@
 /* ======================================================
-   SAC Lab — Main Script (科技可愛版)
+   SAC Lab — Main Script (整合可愛互動 + 柔和亮色修復版)
    ====================================================== */
 
-// ── Scroll Reveal ──
+// ── 1. Scroll Reveal (修復內容消失的關鍵) ──
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
     if (entry.isIntersecting) {
-      setTimeout(() => entry.target.classList.add('visible'), i * 100);
+      // 【關鍵修正】把 'visible' 改成 'active'，對應新的 CSS
+      setTimeout(() => entry.target.classList.add('active'), i * 100);
       observer.unobserve(entry.target);
     }
   });
 }, { threshold: 0.15 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
+// 初始化觀察器
+document.querySelectorAll('.reveal').forEach(el => {
+  observer.observe(el);
+});
 
-// ── Navbar 滾動 ──
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 50);
+// 網頁載入時強制觸發一次，避免一開始畫面沒東西
+window.addEventListener('load', () => {
+  document.querySelectorAll('.reveal').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight) {
+      el.classList.add('active');
+    }
+  });
 });
 
 
-// ── 手機選單 ──
+// ── 2. Navbar 滾動陰影變化 ──
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 50) {
+    navbar.style.boxShadow = "var(--shadow-hover)";
+  } else {
+    navbar.style.boxShadow = "var(--shadow-soft)";
+  }
+});
+
+
+// ── 3. 手機版選單切換 ──
 const toggle = document.querySelector('.nav-toggle');
 const navLinks = document.querySelector('.nav-links');
-if (toggle) {
-  toggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+if (toggle && navLinks) {
+  toggle.addEventListener('click', () => {
+    if (navLinks.style.display === 'flex' && navLinks.style.flexDirection === 'column') {
+      navLinks.style.display = 'none';
+    } else {
+      navLinks.style.display = 'flex';
+      navLinks.style.flexDirection = 'column';
+      navLinks.style.position = 'absolute';
+      navLinks.style.top = '100%';
+      navLinks.style.left = '0';
+      navLinks.style.width = '100%';
+      navLinks.style.background = 'var(--bg-nav)';
+      navLinks.style.padding = '20px';
+      navLinks.style.borderRadius = '20px';
+      navLinks.style.boxShadow = 'var(--shadow-soft)';
+    }
+  });
+
+  // 點擊連結後自動收合選單
   navLinks.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => navLinks.classList.remove('open'));
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 768) navLinks.style.display = 'none';
+    });
   });
 }
 
 
-// ── Active nav link ──
+// ── 4. Active nav link (導覽列隨滾動變色) ──
 const sections = document.querySelectorAll('section[id]');
 const navItems = document.querySelectorAll('.nav-links a');
 window.addEventListener('scroll', () => {
@@ -46,7 +84,7 @@ window.addEventListener('scroll', () => {
 });
 
 
-// ── 游標光暈 ──
+// ── 5. 游標光暈 ──
 const glow = document.getElementById('cursorGlow');
 if (glow && window.innerWidth > 768) {
   document.addEventListener('mousemove', (e) => {
@@ -56,43 +94,35 @@ if (glow && window.innerWidth > 768) {
 }
 
 
-// ── 粒子背景 ──
-const particleContainer = document.getElementById('particles');
-if (particleContainer && window.innerWidth > 768) {
-  for (let i = 0; i < 30; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.style.left = Math.random() * 100 + '%';
-    p.style.top = Math.random() * 100 + '%';
-    p.style.animationDelay = Math.random() * 8 + 's';
-    p.style.animationDuration = (6 + Math.random() * 6) + 's';
-    const colors = ['#5eead4', '#c084fc', '#fb923c', '#f472b6'];
-    p.style.background = colors[Math.floor(Math.random() * colors.length)];
-    particleContainer.appendChild(p);
-  }
-}
-
-
-// ── 點擊 emoji 彈跳 ──
+// ── 6. 點擊 emoji 彈跳 (保留可愛互動) ──
 document.querySelectorAll('.card-icon-wrap, .proj-emoji, .award-icon, .team-avatar, .nav-logo-box, .prof-avatar').forEach(el => {
   el.style.cursor = 'pointer';
   el.addEventListener('click', () => {
     el.style.animation = 'none';
-    el.offsetHeight;
-    el.style.animation = 'jelly 0.5s';
+    el.offsetHeight; // 觸發重繪
+    // 使用 Web Animations API 直接給予果凍彈跳效果
+    el.animate([
+      { transform: 'scale(1)' },
+      { transform: 'scale(1.2) rotate(5deg)' },
+      { transform: 'scale(0.9) rotate(-5deg)' },
+      { transform: 'scale(1.1) rotate(2deg)' },
+      { transform: 'scale(1)' }
+    ], { duration: 500, easing: 'ease-in-out' });
   });
 });
 
 
-// ── 教授學術服務展開/收合 ──
+// ── 7. 教授學術服務展開/收合 ──
 function toggleServices() {
   const extra = document.getElementById('serviceExtra');
   const btn = document.getElementById('expandBtn');
-  if (extra.classList.contains('open')) {
-    extra.classList.remove('open');
-    btn.textContent = '查看更多學術服務 ↓';
-  } else {
-    extra.classList.add('open');
-    btn.textContent = '收合 ↑';
+  if (extra && btn) {
+    if (extra.style.display === 'none' || extra.style.display === '') {
+      extra.style.display = 'grid';
+      btn.innerText = '收起學術服務 ↑';
+    } else {
+      extra.style.display = 'none';
+      btn.innerText = '查看更多學術服務 ↓';
+    }
   }
 }
