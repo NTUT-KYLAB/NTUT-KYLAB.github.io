@@ -1,42 +1,77 @@
 @charset "UTF-8";
 
 :root {
-  /* 柔和亮色系配色 */
+  /* 預設：柔和亮色系配色 */
   --bg-main: #F5F7FA;
-  /* 柔和的淺灰藍背景，不刺眼 */
   --bg-card: #FFFFFF;
-  /* 卡片純白背景 */
   --bg-nav: rgba(255, 255, 255, 0.85);
-  /* 導覽列半透明白 */
 
   --text-main: #4A5568;
-  /* 深灰色文字，比純黑柔和 */
   --text-muted: #718096;
-  /* 次要文字顏色 */
   --text-light: #A0AEC0;
-  /* 標籤或細節文字 */
 
-  /* 可愛柔和的粉彩色系 (降低飽和度，不鮮明刺眼) */
   --color-cyan: #64D2D6;
-  /* 柔和青 */
   --color-purple: #B794F4;
-  /* 柔和紫 */
   --color-orange: #F6AD55;
-  /* 柔和橘 */
   --color-pink: #F687B3;
-  /* 柔和粉 */
   --color-gold: #F6E05E;
-  /* 柔和黃 */
 
-  /* 輕柔的陰影設定 */
   --shadow-soft: 0 8px 24px rgba(149, 157, 165, 0.1);
   --shadow-hover: 0 12px 32px rgba(149, 157, 165, 0.15);
   --border-light: rgba(0, 0, 0, 0.04);
-  /* 極淡的邊框 */
 
-  /* 字體設定 */
   --font-en: 'Space Grotesk', 'Nunito', sans-serif;
   --font-tw: 'Noto Sans TC', sans-serif;
+}
+
+/* ======================================================
+   暗色模式變數 (科技可愛版)
+   ====================================================== */
+body.dark-theme {
+  --bg-main: #0F172A;
+  /* 深邃科技藍黑 */
+  --bg-card: #1E293B;
+  /* 卡片深色背景 */
+  --bg-nav: rgba(30, 41, 59, 0.85);
+
+  --text-main: #F8FAFC;
+  /* 亮白色文字 */
+  --text-muted: #94A3B8;
+  /* 次要文字 */
+  --text-light: #64748B;
+
+  /* 恢復科技版的霓虹鮮明色系 */
+  --color-cyan: #2DD4BF;
+  --color-purple: #A78BFA;
+  --color-orange: #FB923C;
+  --color-pink: #F472B6;
+  --color-gold: #FACC15;
+
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 12px 48px rgba(45, 212, 191, 0.2);
+  --border-light: rgba(255, 255, 255, 0.05);
+}
+
+/* 暗色模式下的網格與文字微調 */
+body.dark-theme .hero-grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+body.dark-theme .proj-num {
+  color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .btn-soft {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  border-color: var(--border-light);
+}
+
+body.dark-theme .btn-soft:hover {
+  background: var(--bg-card);
+  color: var(--color-cyan);
 }
 
 * {
@@ -49,12 +84,73 @@ html {
   scroll-behavior: smooth;
 }
 
+/* 加入背景色與文字顏色的平滑過渡，讓切換主題時不會太生硬 */
+body,
+nav,
+.research-card,
+.project-card,
+.prof-container,
+.award-item,
+.team-card,
+footer,
+.hero-chip,
+.service-item,
+.expertise-tags span {
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+}
+
 body {
   font-family: var(--font-en), var(--font-tw);
   background-color: var(--bg-main);
   color: var(--text-main);
   line-height: 1.6;
   overflow-x: hidden;
+}
+
+/* ====== THEME TOGGLE BUTTON ====== */
+.theme-toggle {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-hover);
+  font-size: 26px;
+  cursor: pointer;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.5s, box-shadow 0.5s;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-5px) scale(1.1);
+}
+
+@keyframes jelly {
+  0% {
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(1.25) rotate(10deg);
+  }
+
+  50% {
+    transform: scale(0.9) rotate(-10deg);
+  }
+
+  70% {
+    transform: scale(1.15) rotate(5deg);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* ====== CURSOR GLOW ====== */
@@ -354,7 +450,7 @@ nav {
   gap: 30px;
   justify-content: center;
   align-items: center;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--bg-nav);
   padding: 20px 40px;
   border-radius: 20px;
   backdrop-filter: blur(10px);
@@ -377,7 +473,7 @@ nav {
 .stat-divider {
   width: 2px;
   height: 40px;
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(128, 128, 128, 0.2);
 }
 
 .hero-scroll {
@@ -476,11 +572,10 @@ section {
   box-shadow: var(--shadow-soft);
   position: relative;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   border: 1px solid var(--border-light);
 }
 
-.card-hover:hover {
+.research-card:hover {
   transform: translateY(-8px);
   box-shadow: var(--shadow-hover);
 }
@@ -560,7 +655,11 @@ section {
   border-radius: 24px;
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.project-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
 }
 
 .proj-header {
@@ -758,7 +857,7 @@ section {
   margin-top: 20px;
   padding: 15px;
   background: none;
-  border: 2px dashed #E2E8F0;
+  border: 2px dashed var(--border-light);
   border-radius: 15px;
   color: var(--text-muted);
   font-weight: 700;
@@ -793,7 +892,11 @@ section {
   text-align: center;
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.team-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
 }
 
 .team-avatar-wrap {
@@ -852,7 +955,11 @@ section {
   border-radius: 20px;
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border-light);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.award-item:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
 }
 
 .award-icon {
@@ -879,7 +986,7 @@ section {
 
 .award-year-badge {
   background: rgba(100, 210, 214, 0.15);
-  color: #38B2AC;
+  color: var(--color-cyan);
   padding: 6px 16px;
   border-radius: 20px;
   font-weight: 800;
@@ -1022,5 +1129,13 @@ footer {
   .award-item {
     flex-direction: column;
     text-align: center;
+  }
+
+  .theme-toggle {
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
   }
 }

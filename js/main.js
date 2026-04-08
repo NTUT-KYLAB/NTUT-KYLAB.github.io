@@ -1,24 +1,22 @@
 /* ======================================================
-   SAC Lab — Main Script (整合可愛互動 + 柔和亮色修復版)
+   SAC Lab — Main Script (加入深淺色主題切換)
    ====================================================== */
 
-// ── 1. Scroll Reveal (修復內容消失的關鍵) ──
+// ── 1. Scroll Reveal (滑動顯示動畫) ──
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
     if (entry.isIntersecting) {
-      // 【關鍵修正】把 'visible' 改成 'active'，對應新的 CSS
       setTimeout(() => entry.target.classList.add('active'), i * 100);
       observer.unobserve(entry.target);
     }
   });
 }, { threshold: 0.15 });
 
-// 初始化觀察器
 document.querySelectorAll('.reveal').forEach(el => {
   observer.observe(el);
 });
 
-// 網頁載入時強制觸發一次，避免一開始畫面沒東西
+// 網頁載入時強制觸發一次，避免頂部畫面沒東西
 window.addEventListener('load', () => {
   document.querySelectorAll('.reveal').forEach(el => {
     const rect = el.getBoundingClientRect();
@@ -61,7 +59,6 @@ if (toggle && navLinks) {
     }
   });
 
-  // 點擊連結後自動收合選單
   navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       if (window.innerWidth <= 768) navLinks.style.display = 'none';
@@ -94,13 +91,12 @@ if (glow && window.innerWidth > 768) {
 }
 
 
-// ── 6. 點擊 emoji 彈跳 (保留可愛互動) ──
+// ── 6. 點擊 emoji 彈跳 (可愛互動) ──
 document.querySelectorAll('.card-icon-wrap, .proj-emoji, .award-icon, .team-avatar, .nav-logo-box, .prof-avatar').forEach(el => {
   el.style.cursor = 'pointer';
   el.addEventListener('click', () => {
     el.style.animation = 'none';
-    el.offsetHeight; // 觸發重繪
-    // 使用 Web Animations API 直接給予果凍彈跳效果
+    el.offsetHeight;
     el.animate([
       { transform: 'scale(1)' },
       { transform: 'scale(1.2) rotate(5deg)' },
@@ -125,4 +121,36 @@ function toggleServices() {
       btn.innerText = '查看更多學術服務 ↓';
     }
   }
+}
+
+// ── 8. 深淺色主題切換 (Dark/Light Mode) ──
+const themeToggle = document.getElementById('themeToggle');
+const body = document.body;
+
+// 網頁載入時，檢查使用者上次選擇的主題
+const savedTheme = localStorage.getItem('saclab-theme');
+if (savedTheme === 'dark') {
+  body.classList.add('dark-theme');
+  if (themeToggle) themeToggle.innerText = '☀️';
+}
+
+// 點擊按鈕切換主題
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark-theme');
+
+    // 按鈕自己的彈跳特效
+    themeToggle.style.animation = 'none';
+    themeToggle.offsetHeight;
+    themeToggle.style.animation = 'jelly 0.5s';
+
+    // 判斷目前狀態並存入 localStorage
+    if (body.classList.contains('dark-theme')) {
+      themeToggle.innerText = '☀️';
+      localStorage.setItem('saclab-theme', 'dark');
+    } else {
+      themeToggle.innerText = '🌙';
+      localStorage.setItem('saclab-theme', 'light');
+    }
+  });
 }
