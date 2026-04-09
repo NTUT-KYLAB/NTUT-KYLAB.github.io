@@ -1175,3 +1175,37 @@ footer {
     font-size: 20px;
   }
 }
+
+/* ====== LAB PHOTO FLOAT CARDS ====== */
+.lab-photo-float {
+  position: absolute;
+  width: 160px;
+  height: 120px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  animation: float-jelly 10s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lab-photo-float img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+}
+
+body.dark-theme .lab-photo-float {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ====== INNER PAGE TOP PADDING ====== */
+/* Ensures first section clears the fixed nav on non-hero pages */
+.page-section {
+  padding-top: 130px;
+}
+}
