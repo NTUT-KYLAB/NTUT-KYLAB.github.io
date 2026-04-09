@@ -27,7 +27,7 @@
 /* ======================================================
    暗色模式變數 (科技可愛版)
    ====================================================== */
-body.dark-theme {
+html.dark-theme {
   --bg-main: #0F172A;
   /* 深邃科技藍黑 */
   --bg-card: #1E293B;
@@ -53,23 +53,23 @@ body.dark-theme {
 }
 
 /* 暗色模式下的網格與文字微調 */
-body.dark-theme .hero-grid-bg {
+html.dark-theme .hero-grid-bg {
   background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
 }
 
-body.dark-theme .proj-num {
+html.dark-theme .proj-num {
   color: rgba(255, 255, 255, 0.05);
 }
 
-body.dark-theme .btn-soft {
+html.dark-theme .btn-soft {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-main);
   border-color: var(--border-light);
 }
 
-body.dark-theme .btn-soft:hover {
+html.dark-theme .btn-soft:hover {
   background: var(--bg-card);
   color: var(--color-cyan);
 }
@@ -1198,7 +1198,7 @@ footer {
   opacity: 0.45;
 }
 
-body.dark-theme .lab-photo-float {
+html.dark-theme .lab-photo-float {
   border-color: rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
 }

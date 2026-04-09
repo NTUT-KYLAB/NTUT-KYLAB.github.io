@@ -184,21 +184,20 @@ function toggleServices() {
 
 // ── 7. 深淺色主題切換 (Dark/Light Mode) ──
 const themeToggle = document.getElementById('themeToggle');
-const body = document.body;
+const htmlEl = document.documentElement;
 
-const savedTheme = localStorage.getItem('saclab-theme');
-if (savedTheme === 'dark') {
-  body.classList.add('dark-theme');
+// Set initial icon based on current theme (class already applied by inline head script)
+if (htmlEl.classList.contains('dark-theme')) {
   if (themeToggle) themeToggle.innerText = '☀️';
 }
 
 if (themeToggle) {
   themeToggle.addEventListener('click', () => {
-    body.classList.toggle('dark-theme');
+    htmlEl.classList.toggle('dark-theme');
     themeToggle.style.animation = 'none';
     themeToggle.offsetHeight;
     themeToggle.style.animation = 'jelly 0.5s';
-    if (body.classList.contains('dark-theme')) {
+    if (htmlEl.classList.contains('dark-theme')) {
       themeToggle.innerText = '☀️';
       localStorage.setItem('saclab-theme', 'dark');
     } else {
