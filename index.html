@@ -156,6 +156,10 @@
       </div>
       <button class="gp-arrow gp-arrow-right" id="gpNext" aria-label="下一個">&#8250;</button>
       <div class="gp-dots" id="gpDots"></div>
+      <button class="gp-mute-btn" id="gpMuteBtn" aria-label="開啟聲音">
+        <svg class="icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+        <svg class="icon-unmuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      </button>
     </div>
 
     <div class="gp-inner">
@@ -166,50 +170,110 @@
   </section>
 
   <script>
+    /* ── YouTube IFrame API ── */
     (function () {
-      const track   = document.getElementById('gpTrack');
-      const stage   = document.getElementById('gpStage');
-      const dotsWrap = document.getElementById('gpDots');
+      var s = document.createElement('script');
+      s.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(s);
+    })();
+
+    var _ytReady = false;
+    var _ytQueue = [];
+    var _prevYTCb = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = function () {
+      _ytReady = true;
+      if (_prevYTCb) _prevYTCb();
+      _ytQueue.forEach(function (fn) { fn(); });
+      _ytQueue = [];
+    };
+    function whenYTReady(fn) { _ytReady ? fn() : _ytQueue.push(fn); }
+
+    /* ── Carousel ── */
+    (function () {
+      var track    = document.getElementById('gpTrack');
+      var stage    = document.getElementById('gpStage');
+      var dotsWrap = document.getElementById('gpDots');
+      var muteBtn  = document.getElementById('gpMuteBtn');
       if (!track || !stage) return;
 
-      const slides = Array.from(track.querySelectorAll('.gp-slide'));
-      const total  = slides.length;
-      let current  = 0;
-      let timer    = null;
+      var slides      = Array.from(track.querySelectorAll('.gp-slide'));
+      var total       = slides.length;
+      var current     = 0;
+      var timer       = null;
+      var isMuted     = true;   // 預設靜音
+      var scrollVol   = 0;      // 0~100，由 scroll 決定
+      var players     = {};     // index → YT.Player
 
-      /* ── 建立 dots ── */
-      slides.forEach((_, i) => {
-        const dot = document.createElement('button');
+      /* dots */
+      slides.forEach(function (_, i) {
+        var dot = document.createElement('button');
         dot.className = 'gp-dot' + (i === 0 ? ' active' : '');
         dot.setAttribute('aria-label', '第 ' + (i + 1) + ' 個');
-        dot.addEventListener('click', () => goTo(i));
+        dot.addEventListener('click', function () { goTo(i); });
         dotsWrap.appendChild(dot);
       });
-
       if (total <= 1) stage.classList.add('gp-single');
 
-      /* ── iframe 動態載入/卸載（避免多支影片同時播放）── */
+      /* 建立 YT.Player */
       function loadSlide(index) {
-        const slide = slides[index];
-        if (slide.querySelector('iframe')) return;
-        const id      = slide.dataset.yt;
-        const url     = slide.dataset.url || '#';
-        const caption = slide.dataset.caption || '';
-        if (!id) return;
-        slide.innerHTML =
-          '<iframe src="https://www.youtube.com/embed/' + id +
-          '?autoplay=1&mute=1&loop=1&playlist=' + id +
-          '&controls=0&playsinline=1" title="' + caption +
-          '" frameborder="0" allow="accelerometer; autoplay; clipboard-write;' +
-          ' encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>' +
-          '<a href="' + url + '" target="_blank" rel="noopener"' +
-          ' class="gp-video-overlay" aria-label="在 YouTube 觀看"></a>' +
-          '<div class="gp-caption">' + caption + '</div>';
+        if (players[index]) return;
+        var slide   = slides[index];
+        var ytId    = slide.dataset.yt;
+        var url     = slide.dataset.url || '#';
+        var caption = slide.dataset.caption || '';
+        if (!ytId) return;
+
+        var playerDiv = document.createElement('div');
+        playerDiv.id = 'gp-player-' + index;
+        slide.appendChild(playerDiv);
+
+        var overlay = document.createElement('a');
+        overlay.href = url;
+        overlay.target = '_blank';
+        overlay.rel = 'noopener';
+        overlay.className = 'gp-video-overlay';
+        overlay.setAttribute('aria-label', '在 YouTube 觀看');
+        slide.appendChild(overlay);
+
+        var cap = document.createElement('div');
+        cap.className = 'gp-caption';
+        cap.textContent = caption;
+        slide.appendChild(cap);
+
+        whenYTReady(function () {
+          players[index] = new YT.Player('gp-player-' + index, {
+            videoId: ytId,
+            playerVars: {
+              autoplay: 1, mute: 1, loop: 1,
+              playlist: ytId, controls: 0,
+              playsinline: 1, rel: 0, modestbranding: 1
+            },
+            events: {
+              onReady: function (e) {
+                e.target.setVolume(0);
+                e.target.playVideo();
+              }
+            }
+          });
+        });
       }
 
       function unloadSlide(index) {
-        const iframe = slides[index].querySelector('iframe');
-        if (iframe) iframe.remove();
+        if (players[index]) {
+          try { players[index].destroy(); } catch (e) {}
+          delete players[index];
+        }
+        slides[index].innerHTML = '';
+      }
+
+      function applyVolume() {
+        var p = players[current];
+        if (!p || !p.setVolume) return;
+        if (isMuted) {
+          p.setVolume(0);
+        } else {
+          p.setVolume(Math.round(scrollVol));
+        }
       }
 
       function updateDots(index) {
@@ -232,24 +296,40 @@
         if (total > 1) timer = setInterval(function () { goTo(current + 1); }, 6000);
       }
 
+      /* 靜音按鈕 */
+      muteBtn.addEventListener('click', function () {
+        isMuted = !isMuted;
+        muteBtn.querySelector('.icon-muted').style.display   = isMuted  ? '' : 'none';
+        muteBtn.querySelector('.icon-unmuted').style.display = isMuted  ? 'none' : '';
+        muteBtn.setAttribute('aria-label', isMuted ? '開啟聲音' : '關閉聲音');
+        applyVolume();
+      });
+
+      /* 箭頭 */
       document.getElementById('gpPrev').addEventListener('click', function () { goTo(current - 1); });
       document.getElementById('gpNext').addEventListener('click', function () { goTo(current + 1); });
 
-      loadSlide(0);
-      resetTimer();
-
-      /* ── Scroll → 逐漸全螢幕展開 ── */
+      /* Scroll：全螢幕展開 + 音量漸變 */
       function onScroll() {
         var rect     = stage.getBoundingClientRect();
         var vh       = window.innerHeight;
         var progress = Math.min(1, Math.max(0, (vh - rect.top) / (vh * 0.55)));
-        var pct      = (1 - progress) * 5;
+
+        /* 全螢幕 */
+        var pct = (1 - progress) * 5;
         stage.style.marginLeft   = pct + '%';
         stage.style.marginRight  = pct + '%';
         stage.style.borderRadius = ((1 - progress) * 24) + 'px';
+
+        /* 音量 0→100 */
+        scrollVol = progress * 100;
+        applyVolume();
       }
 
       window.addEventListener('scroll', onScroll, { passive: true });
+
+      loadSlide(0);
+      resetTimer();
       onScroll();
     })();
   </script>
