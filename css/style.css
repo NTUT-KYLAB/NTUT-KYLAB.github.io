@@ -1665,50 +1665,51 @@ html.dark-theme .pd-goal-num {
 }
 
 /* ====== GALLERY PREVIEW (Homepage) ====== */
+/* ===== GALLERY PREVIEW CAROUSEL ===== */
 .gallery-preview {
-  padding: 80px 5%;
+  padding: 80px 0;
+  overflow: hidden;
+}
+
+.gp-inner {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 5%;
 }
 
-.gp-grid {
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  grid-template-rows: 220px 220px;
-  gap: 16px;
-  margin: 50px 0 40px;
-}
-
-.gp-card {
+/* Stage：預設留左右 5% margin，scroll 時 JS 逐漸縮至 0 */
+.gp-stage {
   position: relative;
-  border-radius: 20px;
+  margin: 40px 5%;
+  border-radius: 24px;
   overflow: hidden;
-  cursor: pointer;
-  box-shadow: var(--shadow-soft);
-  transition: transform 0.35s, box-shadow 0.35s;
+  background: #000;
+  aspect-ratio: 16 / 9;
 }
 
-.gp-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-hover);
+.gp-carousel {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
-.gp-card.gp-featured {
-  grid-row: 1 / 3;
+.gp-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.gp-video-wrap {
+.gp-slide {
+  flex: 0 0 100%;
+  height: 100%;
   position: relative;
-  width: 100%;
-  height: 100%;
 }
 
-.gp-video-wrap iframe {
+.gp-slide iframe {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: 0;
   display: block;
 }
 
@@ -1719,71 +1720,97 @@ html.dark-theme .pd-goal-num {
   cursor: pointer;
 }
 
-.gp-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.5s;
-}
-
-.gp-card:hover img {
-  transform: scale(1.05);
-}
-
-.gp-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  opacity: 0.85;
-}
-
-.gp-placeholder span {
-  font-size: 3rem;
-}
-
-.gp-placeholder p {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.7);
-  font-weight: 600;
-  letter-spacing: 1px;
-}
-
 .gp-caption {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   padding: 20px 20px 16px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.55));
+  background: linear-gradient(transparent, rgba(0,0,0,0.6));
   color: #fff;
   font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  transform: translateY(4px);
-  transition: transform 0.3s;
+  z-index: 2;
 }
 
-.gp-card:hover .gp-caption {
-  transform: translateY(0);
+/* 左右箭頭 */
+.gp-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.gp-arrow:hover {
+  background: rgba(255,255,255,0.32);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.gp-arrow-left  { left: 20px; }
+.gp-arrow-right { right: 20px; }
+
+/* 只有一個影片時隱藏箭頭與 dots */
+.gp-stage.gp-single .gp-arrow,
+.gp-stage.gp-single .gp-dots { display: none; }
+
+/* Dots */
+.gp-dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.gp-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+  padding: 0;
+}
+
+.gp-dot.active {
+  background: #fff;
+  transform: scale(1.35);
 }
 
 .gp-cta {
   text-align: center;
+  margin-top: 40px;
 }
 
 @media (max-width: 768px) {
-  .gp-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: 240px 180px 180px;
+  .gp-stage {
+    margin: 24px 0;
+    border-radius: 0;
   }
-  .gp-card.gp-featured {
-    grid-row: 1 / 2;
+  .gp-arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
   }
+  .gp-arrow-left  { left: 10px; }
+  .gp-arrow-right { right: 10px; }
 }
 
 /* ====== GALLERY PAGE ====== */
