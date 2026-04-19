@@ -8,7 +8,7 @@
 
 ## 🌐 網站入口
 
-**👉 [前往實驗室官方網站](https://ntut-kylab.github.io/)**
+**👉 [前往實驗室官方網站](https://ntut-kylab.github.io/KYLAB-NTUT/)**
 
 網站涵蓋：
 - 主要研究領域（無人機、語音處理、影像辨識、節能控制）

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the official static website for **KY Lab (System Analysis & Control Lab)** at National Taipei University of Technology (NTUT), led by Prof. Kuang-Yow Lian. It is a pure static HTML/CSS/JS site deployed via GitHub Pages — no build step, no package manager, no framework.
 
-**Live site:** https://ntut-kylab.github.io/
+**Live site:** https://ntut-kylab.github.io/KYLAB-NTUT/
 
 ## Deployment
 
