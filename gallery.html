@@ -28,19 +28,18 @@
         <p class="section-desc">記錄 KY Lab 的精彩時刻、日常點滴與研究成果展示</p>
       </div>
 
-      <!-- ===== 照片區 ===== -->
-      <!-- 新增照片說明：
-           1. 將照片放入 images/gallery/ 資料夾
-           2. 複製一個 .gl-item 區塊，將 .gl-item-placeholder 換成 <img src="images/gallery/你的檔名.jpg" alt="說明">
-           3. 修改 .gl-item-caption 的文字
+      <!-- ===== 活動相簿 ===== -->
+      <!-- 新增活動說明：
+           在 Google Drive 主資料夾中新增子資料夾（資料夾名稱即活動名稱），
+           將照片放入該子資料夾，網頁會自動出現對應的活動卡片。
       -->
-      <h3 class="gl-section-title reveal">📷 照片集錦</h3>
-      <div class="gl-photo-grid reveal" id="glPhotoGrid">
-        <div class="gl-drive-loading" id="glLoadState">
+      <h3 class="gl-section-title reveal">📷 活動相簿</h3>
+      <div class="gl-event-grid reveal" id="glEventGrid">
+        <div class="gl-drive-loading">
           <div class="gl-drive-spinner"></div>
-          <p>照片載入中...</p>
+          <p>活動載入中...</p>
         </div>
-      </div><!-- /gl-photo-grid -->
+      </div>
 
       <!-- ===== 影片區 ===== -->
       <!-- 新增影片說明：
@@ -62,7 +61,6 @@
           </div>
           <div class="gl-video-info">
             <h3>研究成果展示</h3>
-            <p>請將此 VIDEO_ID 換成實際的 YouTube 影片 ID</p>
           </div>
         </div>
 
@@ -84,6 +82,17 @@
 
   </div><!-- /gallery-page -->
 
+  <!-- ===== 活動照片 Modal ===== -->
+  <div class="gl-event-modal" id="glEventModal">
+    <div class="gl-event-modal-inner">
+      <div class="gl-event-modal-header">
+        <h3 id="glModalTitle"></h3>
+        <button class="gl-event-modal-close" id="glModalClose" aria-label="關閉">✕</button>
+      </div>
+      <div class="gl-photo-grid gl-modal-grid" id="glModalGrid"></div>
+    </div>
+  </div>
+
   <!-- Lightbox -->
   <div class="gl-lightbox" id="glLightbox">
     <button class="gl-lightbox-close" id="glLightboxClose">✕</button>
@@ -93,67 +102,157 @@
   <script src="js/components.js"></script>
   <script src="js/main.js"></script>
   <script>
-    // ── Google Drive 照片載入 ──
     (function () {
       var FOLDER_ID = '1HHxoyxt6y71EgBPXXLb1V6R6s8T1vaLs';
       var API_KEY   = 'AIzaSyCpFx9VkFz5yY0oyC_MohaABssG0UFysqA';
-      var grid      = document.getElementById('glPhotoGrid');
+      var eventGrid = document.getElementById('glEventGrid');
+      var modal     = document.getElementById('glEventModal');
+      var modalTitle = document.getElementById('glModalTitle');
+      var modalGrid = document.getElementById('glModalGrid');
       var lb        = document.getElementById('glLightbox');
       var lbImg     = document.getElementById('glLightboxImg');
 
-      var apiUrl = 'https://www.googleapis.com/drive/v3/files'
-        + '?q=%27' + FOLDER_ID + '%27+in+parents+and+mimeType+contains+%27image/%27'
-        + '&fields=files(id,name)&orderBy=name&pageSize=100'
-        + '&key=' + API_KEY;
+      function api(q, extra) {
+        return 'https://www.googleapis.com/drive/v3/files'
+          + '?q=' + encodeURIComponent(q)
+          + '&fields=files(id,name)&key=' + API_KEY
+          + (extra || '');
+      }
 
-      function thumbUrl(id, w) {
+      function thumb(id, w) {
         return 'https://drive.google.com/thumbnail?id=' + id + '&sz=w' + w;
       }
 
+      function shuffle(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+      }
+
+      // ── Lightbox ──
+      document.getElementById('glLightboxClose').addEventListener('click', function () {
+        lb.classList.remove('active'); lbImg.src = '';
+      });
+      lb.addEventListener('click', function (e) {
+        if (e.target === e.currentTarget) { lb.classList.remove('active'); lbImg.src = ''; }
+      });
+
       function openLightbox(fileId, alt) {
-        lbImg.src = thumbUrl(fileId, 2400);
+        lbImg.src = thumb(fileId, 2400);
         lbImg.alt = alt;
         lb.classList.add('active');
       }
 
-      fetch(apiUrl)
+      // ── Modal ──
+      function openModal(folderId, folderName) {
+        modalTitle.textContent = folderName;
+        modalGrid.innerHTML = '<div class="gl-drive-loading"><div class="gl-drive-spinner"></div><p>載入中...</p></div>';
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        fetch(api("'" + folderId + "' in parents and mimeType contains 'image/' and trashed=false", '&orderBy=name&pageSize=200'))
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            modalGrid.innerHTML = '';
+            shuffle(data.files || []).forEach(function (file) {
+              var item = document.createElement('div');
+              item.className = 'gl-item';
+              var img = document.createElement('img');
+              img.src = thumb(file.id, 600);
+              img.alt = file.name.replace(/\.[^.]+$/, '');
+              img.loading = 'lazy';
+              item.appendChild(img);
+              item.addEventListener('click', function () { openLightbox(file.id, img.alt); });
+              modalGrid.appendChild(item);
+            });
+          })
+          .catch(function () {
+            modalGrid.innerHTML = '<p style="padding:30px;color:var(--text-muted)">載入失敗</p>';
+          });
+      }
+
+      function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        modalGrid.innerHTML = '';
+      }
+
+      document.getElementById('glModalClose').addEventListener('click', closeModal);
+      modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+      // ── 活動卡片 ──
+      fetch(api("'" + FOLDER_ID + "' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false", '&orderBy=name'))
         .then(function (r) { return r.json(); })
         .then(function (data) {
-          grid.innerHTML = '';
-          if (!data.files || !data.files.length) {
-            grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px">暫無照片</p>';
-            return;
+          var folders = data.files || [];
+
+          // 若無子資料夾，退回顯示根目錄散圖
+          if (!folders.length) {
+            return fetch(api("'" + FOLDER_ID + "' in parents and mimeType contains 'image/' and trashed=false", '&orderBy=name&pageSize=100'))
+              .then(function (r) { return r.json(); })
+              .then(function (d) {
+                eventGrid.className = 'gl-photo-grid reveal active';
+                eventGrid.innerHTML = '';
+                shuffle(d.files || []).forEach(function (file) {
+                  var item = document.createElement('div');
+                  item.className = 'gl-item';
+                  var img = document.createElement('img');
+                  img.src = thumb(file.id, 800);
+                  img.alt = file.name.replace(/\.[^.]+$/, '');
+                  img.loading = 'lazy';
+                  item.appendChild(img);
+                  item.addEventListener('click', function () { openLightbox(file.id, img.alt); });
+                  eventGrid.appendChild(item);
+                });
+              });
           }
-          data.files.forEach(function (file) {
-            var item = document.createElement('div');
-            item.className = 'gl-item';
-            var img = document.createElement('img');
-            img.src = thumbUrl(file.id, 800);
-            img.alt = file.name.replace(/\.[^.]+$/, '');
-            img.loading = 'lazy';
-            img.dataset.fileId = file.id;
-            item.appendChild(img);
-            item.addEventListener('click', function () {
-              openLightbox(file.id, img.alt);
-            });
-            grid.appendChild(item);
+
+          // 有子資料夾：取每個封面照
+          return Promise.all(folders.map(function (folder) {
+            return fetch(api("'" + folder.id + "' in parents and mimeType contains 'image/' and trashed=false", '&orderBy=name&pageSize=1'))
+              .then(function (r) { return r.json(); })
+              .then(function (d) {
+                return { id: folder.id, name: folder.name, cover: d.files && d.files[0] ? d.files[0].id : null };
+              });
+          }));
+        })
+        .then(function (events) {
+          if (!events) return; // 退回散圖已處理
+          eventGrid.innerHTML = '';
+          events.forEach(function (ev) {
+            var card = document.createElement('div');
+            card.className = 'gl-event-card';
+
+            if (ev.cover) {
+              var img = document.createElement('img');
+              img.className = 'gl-event-cover';
+              img.src = thumb(ev.cover, 600);
+              img.alt = ev.name;
+              img.loading = 'lazy';
+              card.appendChild(img);
+            } else {
+              var ph = document.createElement('div');
+              ph.className = 'gl-event-cover-ph';
+              ph.innerHTML = '<span>📷</span>';
+              card.appendChild(ph);
+            }
+
+            var count = document.createElement('div');
+            count.className = 'gl-event-name';
+            count.textContent = ev.name;
+            card.appendChild(count);
+
+            card.addEventListener('click', function () { openModal(ev.id, ev.name); });
+            eventGrid.appendChild(card);
           });
         })
         .catch(function () {
-          grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px">照片載入失敗，請稍後再試</p>';
+          eventGrid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px">載入失敗，請稍後再試</p>';
         });
-
-      // Lightbox 關閉
-      document.getElementById('glLightboxClose').addEventListener('click', function () {
-        lb.classList.remove('active');
-        lbImg.src = '';
-      });
-      lb.addEventListener('click', function (e) {
-        if (e.target === e.currentTarget) {
-          lb.classList.remove('active');
-          lbImg.src = '';
-        }
-      });
     })();
   </script>
 </body>

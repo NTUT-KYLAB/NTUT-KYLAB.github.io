@@ -449,7 +449,7 @@
   </script>
 
   <script>
-    /* ── Google Drive 照片輪播帶 ── */
+    /* ── Google Drive 照片輪播帶（每個活動各取一張封面）── */
     (function () {
       var FOLDER_ID = '1HHxoyxt6y71EgBPXXLb1V6R6s8T1vaLs';
       var API_KEY   = 'AIzaSyCpFx9VkFz5yY0oyC_MohaABssG0UFysqA';
@@ -459,39 +459,64 @@
       var outer     = document.getElementById('gpPhotoOuter');
       if (!strip) return;
 
-      var apiUrl = 'https://www.googleapis.com/drive/v3/files'
-        + '?q=%27' + FOLDER_ID + '%27+in+parents+and+mimeType+contains+%27image/%27'
-        + '&fields=files(id,name)&orderBy=name&pageSize=100'
-        + '&key=' + API_KEY;
+      function api(q, extra) {
+        return 'https://www.googleapis.com/drive/v3/files'
+          + '?q=' + encodeURIComponent(q)
+          + '&fields=files(id,name)&key=' + API_KEY + (extra || '');
+      }
 
-      fetch(apiUrl)
+      function thumb(id) {
+        return 'https://drive.google.com/thumbnail?id=' + id + '&sz=w600';
+      }
+
+      function addPhoto(fileId, alt) {
+        var img = document.createElement('img');
+        img.className = 'gp-ps-photo';
+        img.src = thumb(fileId);
+        img.alt = alt;
+        img.loading = 'lazy';
+        strip.appendChild(img);
+      }
+
+      function initArrows() {
+        var amt = 320;
+        prevBtn.addEventListener('click', function () { strip.scrollBy({ left: -amt, behavior: 'smooth' }); });
+        nextBtn.addEventListener('click', function () { strip.scrollBy({ left:  amt, behavior: 'smooth' }); });
+      }
+
+      // 先嘗試抓子資料夾，每個活動取一張封面
+      fetch(api("'" + FOLDER_ID + "' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false", '&orderBy=name'))
         .then(function (r) { return r.json(); })
         .then(function (data) {
-          strip.innerHTML = '';
-          if (!data.files || !data.files.length) {
-            outer.style.display = 'none';
-            return;
+          var folders = data.files || [];
+
+          if (!folders.length) {
+            // 無子資料夾：退回顯示根目錄前 20 張
+            return fetch(api("'" + FOLDER_ID + "' in parents and mimeType contains 'image/' and trashed=false", '&orderBy=name&pageSize=20'))
+              .then(function (r) { return r.json(); })
+              .then(function (d) {
+                strip.innerHTML = '';
+                (d.files || []).forEach(function (f) { addPhoto(f.id, f.name); });
+                if (!d.files || !d.files.length) outer.style.display = 'none';
+                else initArrows();
+              });
           }
-          data.files.forEach(function (file) {
-            var img = document.createElement('img');
-            img.className = 'gp-ps-photo';
-            img.src = 'https://drive.google.com/thumbnail?id=' + file.id + '&sz=w600';
-            img.alt = file.name.replace(/\.[^.]+$/, '');
-            img.loading = 'lazy';
-            strip.appendChild(img);
-          });
-          // Arrow scroll
-          var scrollAmt = 300;
-          prevBtn.addEventListener('click', function () {
-            strip.scrollBy({ left: -scrollAmt, behavior: 'smooth' });
-          });
-          nextBtn.addEventListener('click', function () {
-            strip.scrollBy({ left: scrollAmt, behavior: 'smooth' });
-          });
+
+          // 有子資料夾：每個資料夾取第 1 張
+          return Promise.all(folders.map(function (folder) {
+            return fetch(api("'" + folder.id + "' in parents and mimeType contains 'image/' and trashed=false", '&orderBy=name&pageSize=1'))
+              .then(function (r) { return r.json(); })
+              .then(function (d) { return d.files && d.files[0] ? d.files[0] : null; });
+          }));
         })
-        .catch(function () {
-          outer.style.display = 'none';
-        });
+        .then(function (covers) {
+          if (!covers) return; // 已由退回處理
+          strip.innerHTML = '';
+          covers.filter(Boolean).forEach(function (f) { addPhoto(f.id, f.name); });
+          if (!covers.filter(Boolean).length) outer.style.display = 'none';
+          else initArrows();
+        })
+        .catch(function () { outer.style.display = 'none'; });
     })();
   </script>
 
