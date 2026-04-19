@@ -133,6 +133,15 @@
       </div>
     </div>
 
+    <!-- ── 照片輪播帶 ── -->
+    <div class="gp-photo-strip-outer reveal" id="gpPhotoOuter">
+      <button class="gp-ps-btn gp-ps-prev" id="gpPsPrev" aria-label="上一張">&#8249;</button>
+      <div class="gp-photo-strip" id="gpPhotoStrip">
+        <div class="gp-ps-loading" id="gpPsLoading">照片載入中...</div>
+      </div>
+      <button class="gp-ps-btn gp-ps-next" id="gpPsNext" aria-label="下一張">&#8250;</button>
+    </div>
+
     <!-- gp-wrap 包住 stage + controls，scroll 時整體展開 -->
     <div class="gp-wrap reveal" id="gpWrap">
       <div class="gp-stage" id="gpStage">
@@ -436,6 +445,53 @@
       window.addEventListener('scroll', onScroll, { passive: true });
       loadSlide(0);
       onScroll();
+    })();
+  </script>
+
+  <script>
+    /* ── Google Drive 照片輪播帶 ── */
+    (function () {
+      var FOLDER_ID = '1HHxoyxt6y71EgBPXXLb1V6R6s8T1vaLs';
+      var API_KEY   = 'AIzaSyCpFx9VkFz5yY0oyC_MohaABssG0UFysqA';
+      var strip     = document.getElementById('gpPhotoStrip');
+      var prevBtn   = document.getElementById('gpPsPrev');
+      var nextBtn   = document.getElementById('gpPsNext');
+      var outer     = document.getElementById('gpPhotoOuter');
+      if (!strip) return;
+
+      var apiUrl = 'https://www.googleapis.com/drive/v3/files'
+        + '?q=%27' + FOLDER_ID + '%27+in+parents+and+mimeType+contains+%27image/%27'
+        + '&fields=files(id,name)&orderBy=name&pageSize=100'
+        + '&key=' + API_KEY;
+
+      fetch(apiUrl)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          strip.innerHTML = '';
+          if (!data.files || !data.files.length) {
+            outer.style.display = 'none';
+            return;
+          }
+          data.files.forEach(function (file) {
+            var img = document.createElement('img');
+            img.className = 'gp-ps-photo';
+            img.src = 'https://drive.google.com/thumbnail?id=' + file.id + '&sz=w600';
+            img.alt = file.name.replace(/\.[^.]+$/, '');
+            img.loading = 'lazy';
+            strip.appendChild(img);
+          });
+          // Arrow scroll
+          var scrollAmt = 300;
+          prevBtn.addEventListener('click', function () {
+            strip.scrollBy({ left: -scrollAmt, behavior: 'smooth' });
+          });
+          nextBtn.addEventListener('click', function () {
+            strip.scrollBy({ left: scrollAmt, behavior: 'smooth' });
+          });
+        })
+        .catch(function () {
+          outer.style.display = 'none';
+        });
     })();
   </script>
 

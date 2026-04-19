@@ -2129,3 +2129,110 @@ html.dark-theme .pd-goal-num {
     columns: 1;
   }
 }
+
+/* ── Gallery Drive loading state ── */
+.gl-photo-grid:has(.gl-drive-loading) {
+  columns: unset;
+  display: flex;
+  justify-content: center;
+  min-height: 160px;
+}
+
+.gl-drive-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.gl-drive-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border-light);
+  border-top-color: var(--color-cyan);
+  border-radius: 50%;
+  animation: spinnerRot 0.8s linear infinite;
+}
+
+@keyframes spinnerRot {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Index photo strip ── */
+.gp-photo-strip-outer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0 auto 32px;
+  max-width: 1200px;
+  padding: 0 20px;
+}
+
+.gp-photo-strip {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 8px 0;
+  flex: 1;
+}
+
+.gp-photo-strip::-webkit-scrollbar { display: none; }
+
+.gp-ps-photo {
+  height: 200px;
+  width: auto;
+  flex-shrink: 0;
+  border-radius: 14px;
+  object-fit: cover;
+  scroll-snap-align: start;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.gp-ps-photo:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow-hover);
+}
+
+.gp-ps-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: background 0.2s, transform 0.2s;
+  z-index: 1;
+}
+
+.gp-ps-btn:hover {
+  background: var(--color-cyan);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.gp-ps-loading {
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .gp-ps-photo { height: 140px; }
+  .gp-ps-btn { width: 32px; height: 32px; font-size: 1.1rem; }
+}
