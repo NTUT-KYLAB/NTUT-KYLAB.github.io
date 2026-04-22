@@ -317,7 +317,9 @@
       function applyVolume() {
         var p = players[current];
         if (!p || !p.setVolume) return;
-        p.setVolume(isMuted ? 0 : Math.round(scrollVol));
+        var vol = isMuted ? 0 : Math.round(scrollVol);
+        if (vol > 0) { try { p.unMute(); } catch (err) {} }
+        p.setVolume(vol);
       }
 
       /* ── 載入 slide ── */
@@ -347,12 +349,12 @@
         whenYTReady(function () {
           players[index] = new YT.Player('gp-player-' + index, {
             videoId: ytId,
-            playerVars: { autoplay: 1, mute: 1, controls: 0, playsinline: 1, rel: 0, modestbranding: 1 },
+            playerVars: { autoplay: 1, mute: 1, controls: 0, playsinline: 1, rel: 0, modestbranding: 1, hd: 1 },
             events: {
               onReady: function (e) {
-                e.target.unMute();
-                /* 套用目前靜音狀態與音量，避免切換影片後靜音 */
-                e.target.setVolume(isMuted ? 0 : Math.round(scrollVol));
+                /* 不在這裡 unMute()：手機瀏覽器要求使用者手勢才能解除靜音，
+                   否則會擋掉整個自動播放。音量由 applyVolume() 按需求控制。 */
+                e.target.setVolume(0);
                 e.target.playVideo();
               },
               onStateChange: function (e) {
