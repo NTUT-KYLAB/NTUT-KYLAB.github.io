@@ -497,6 +497,8 @@ function injectModals() {
 // ── INIT ──
 
 document.addEventListener('DOMContentLoaded', () => {
+  const st = document.getElementById('members-status');
+  if (st) st.textContent = '🔌 JS 已載入，連線 Firestore…';
   injectModals();
   initAuth();
   loadMembers();
