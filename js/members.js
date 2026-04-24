@@ -60,9 +60,8 @@ function buildCardHTML(m, docId) {
 }
 
 function renderMembers(members) {
-  console.log('[members] renderMembers called with', members.length, 'members');
   const grid = document.getElementById('members-grid');
-  if (!grid) { console.error('[members] #members-grid not found!'); return; }
+  if (!grid) return;
 
   const groups = {};
   const yearOrder = [];
@@ -88,15 +87,13 @@ function renderMembers(members) {
 async function loadMembers() {
   try {
     const snap = await getDocs(collection(db, 'members'));
-    console.log('[members] docs count:', snap.size);
     const members = snap.docs
       .map(d => ({ id: d.id, data: d.data() }))
       .sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
-    console.log('[members] sorted:', members.map(m => m.id));
     renderMembers(members);
     if (currentMemberId) addEditButton(currentMemberId);
   } catch (err) {
-    console.error('[members] loadMembers failed:', err);
+    console.error('loadMembers failed:', err);
     const grid = document.getElementById('members-grid');
     if (grid) grid.innerHTML = `<p style="padding:40px;color:var(--text-muted)">載入失敗：${err.message}</p>`;
   }
@@ -499,8 +496,6 @@ function injectModals() {
 // ── INIT ──
 
 document.addEventListener('DOMContentLoaded', () => {
-  const st = document.getElementById('members-status');
-  if (st) st.textContent = '🔌 JS 已載入，連線 Firestore…';
   injectModals();
   initAuth();
   loadMembers();
