@@ -1,0 +1,141 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]: This XML file does not appear to have any style information associated with it. The document tree is shown below.
+  - generic [ref=e4]:
+    - generic [ref=e7]:
+      - text: <urlset
+      - generic [ref=e8]: xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      - text: ">"
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e13]: <url>
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e16]: <loc>
+            - text: https://kylab-ntut.github.io/
+            - generic [ref=e17]: </loc>
+          - generic [ref=e18]:
+            - generic [ref=e19]: <priority>
+            - text: "1.0"
+            - generic [ref=e20]: </priority>
+        - generic [ref=e22]: </url>
+      - generic [ref=e23]:
+        - generic [ref=e26]: <url>
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - generic [ref=e29]: <loc>
+            - text: https://kylab-ntut.github.io/research.html
+            - generic [ref=e30]: </loc>
+          - generic [ref=e31]:
+            - generic [ref=e32]: <priority>
+            - text: "0.8"
+            - generic [ref=e33]: </priority>
+        - generic [ref=e35]: </url>
+      - generic [ref=e36]:
+        - generic [ref=e39]: <url>
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - generic [ref=e42]: <loc>
+            - text: https://kylab-ntut.github.io/projects.html
+            - generic [ref=e43]: </loc>
+          - generic [ref=e44]:
+            - generic [ref=e45]: <priority>
+            - text: "0.8"
+            - generic [ref=e46]: </priority>
+        - generic [ref=e48]: </url>
+      - generic [ref=e49]:
+        - generic [ref=e52]: <url>
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - generic [ref=e55]: <loc>
+            - text: https://kylab-ntut.github.io/professor.html
+            - generic [ref=e56]: </loc>
+          - generic [ref=e57]:
+            - generic [ref=e58]: <priority>
+            - text: "0.8"
+            - generic [ref=e59]: </priority>
+        - generic [ref=e61]: </url>
+      - generic [ref=e62]:
+        - generic [ref=e65]: <url>
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - generic [ref=e68]: <loc>
+            - text: https://kylab-ntut.github.io/members.html
+            - generic [ref=e69]: </loc>
+          - generic [ref=e70]:
+            - generic [ref=e71]: <priority>
+            - text: "0.8"
+            - generic [ref=e72]: </priority>
+        - generic [ref=e74]: </url>
+      - generic [ref=e75]:
+        - generic [ref=e78]: <url>
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - generic [ref=e81]: <loc>
+            - text: https://kylab-ntut.github.io/awards.html
+            - generic [ref=e82]: </loc>
+          - generic [ref=e83]:
+            - generic [ref=e84]: <priority>
+            - text: "0.8"
+            - generic [ref=e85]: </priority>
+        - generic [ref=e87]: </url>
+      - generic [ref=e88]:
+        - generic [ref=e91]: <url>
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]: <loc>
+            - text: https://kylab-ntut.github.io/gallery.html
+            - generic [ref=e95]: </loc>
+          - generic [ref=e96]:
+            - generic [ref=e97]: <priority>
+            - text: "0.7"
+            - generic [ref=e98]: </priority>
+        - generic [ref=e100]: </url>
+      - generic [ref=e101]:
+        - generic [ref=e104]: <url>
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - generic [ref=e107]: <loc>
+            - text: https://kylab-ntut.github.io/project-drone.html
+            - generic [ref=e108]: </loc>
+          - generic [ref=e109]:
+            - generic [ref=e110]: <priority>
+            - text: "0.6"
+            - generic [ref=e111]: </priority>
+        - generic [ref=e113]: </url>
+      - generic [ref=e114]:
+        - generic [ref=e117]: <url>
+        - generic [ref=e118]:
+          - generic [ref=e119]:
+            - generic [ref=e120]: <loc>
+            - text: https://kylab-ntut.github.io/project-speech.html
+            - generic [ref=e121]: </loc>
+          - generic [ref=e122]:
+            - generic [ref=e123]: <priority>
+            - text: "0.6"
+            - generic [ref=e124]: </priority>
+        - generic [ref=e126]: </url>
+      - generic [ref=e127]:
+        - generic [ref=e130]: <url>
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - generic [ref=e133]: <loc>
+            - text: https://kylab-ntut.github.io/project-vision.html
+            - generic [ref=e134]: </loc>
+          - generic [ref=e135]:
+            - generic [ref=e136]: <priority>
+            - text: "0.6"
+            - generic [ref=e137]: </priority>
+        - generic [ref=e139]: </url>
+      - generic [ref=e140]:
+        - generic [ref=e143]: <url>
+        - generic [ref=e144]:
+          - generic [ref=e145]:
+            - generic [ref=e146]: <loc>
+            - text: https://kylab-ntut.github.io/project-energy.html
+            - generic [ref=e147]: </loc>
+          - generic [ref=e148]:
+            - generic [ref=e149]: <priority>
+            - text: "0.6"
+            - generic [ref=e150]: </priority>
+        - generic [ref=e152]: </url>
+    - generic [ref=e154]: </urlset>
