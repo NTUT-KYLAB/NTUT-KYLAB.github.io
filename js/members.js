@@ -44,7 +44,7 @@ function buildCardHTML(m, docId) {
   const bioHTML = m.bio ? `<p class="member-bio">${m.bio}</p>` : '';
 
   return `
-    <div class="team-card member-card reveal card-hover" data-member-id="${docId}">
+    <div class="team-card member-card reveal visible card-hover" data-member-id="${docId}">
       <div class="team-avatar-wrap">
         <div class="team-avatar avatar-placeholder">${avatarContent}</div>
         <div class="avatar-ring ${m.avatarColor || 'cyan'}"></div>
@@ -74,7 +74,7 @@ function renderMembers(members) {
   let html = '';
   for (const year of yearOrder) {
     html += `
-      <div class="member-group-header reveal">
+      <div class="member-group-header reveal visible">
         <span class="group-badge">${YEAR_LABELS[year] || year}</span>
       </div>
       <div class="team-grid member-grid">
@@ -83,7 +83,6 @@ function renderMembers(members) {
     `;
   }
   grid.innerHTML = html;
-  initRevealAnimation();
 }
 
 async function loadMembers() {
