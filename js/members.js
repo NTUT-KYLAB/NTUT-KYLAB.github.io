@@ -333,11 +333,13 @@ function openEditModal(memberId) {
   setupTagInput();
   pendingPhotoBlob = null;
 
+  document.getElementById('restore-photo-btn').style.display = 'none';
   document.getElementById('edit-modal').classList.remove('hidden');
 }
 
 function closeEditModal() {
   document.getElementById('edit-modal').classList.add('hidden');
+  document.getElementById('restore-photo-btn').style.display = 'none';
   pendingPhotoBlob = null;
 }
 
@@ -350,6 +352,7 @@ async function handlePhotoSelect(e) {
     const preview = document.getElementById('edit-photo-preview');
     preview.src = URL.createObjectURL(pendingPhotoBlob);
     preview.style.display = 'block';
+    document.getElementById('restore-photo-btn').style.display = 'block';
   } catch { showToast('圖片處理失敗，請重試', 'error'); }
 }
 
@@ -439,6 +442,7 @@ function injectModals() {
               <img id="edit-photo-preview" class="avatar-preview" src="" alt="預覽" style="display:none">
               <div>
                 <button class="upload-btn" id="upload-photo-btn">📷 上傳照片</button>
+                <button class="upload-btn" id="restore-photo-btn" style="display:none;margin-top:6px;border-color:var(--color-orange);color:var(--color-orange)">↩️ 還原上一張</button>
                 <input type="file" id="photo-file-input" accept="image/jpeg,image/png,image/webp" style="display:none">
                 <p class="upload-hint">JPG / PNG / WEBP，最大 20MB</p>
               </div>
@@ -486,6 +490,15 @@ function injectModals() {
   document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
   document.getElementById('upload-photo-btn').addEventListener('click', () => {
     document.getElementById('photo-file-input').click();
+  });
+  document.getElementById('restore-photo-btn').addEventListener('click', () => {
+    pendingPhotoBlob = null;
+    const preview = document.getElementById('edit-photo-preview');
+    const orig = currentMemberData?.photoURL;
+    if (orig) { preview.src = orig; preview.style.display = 'block'; }
+    else { preview.src = ''; preview.style.display = 'none'; }
+    document.getElementById('restore-photo-btn').style.display = 'none';
+    document.getElementById('photo-file-input').value = '';
   });
   document.getElementById('photo-file-input').addEventListener('change', handlePhotoSelect);
   document.getElementById('edit-modal').addEventListener('click', e => {
