@@ -33,10 +33,12 @@ const YEAR_LABELS = {
 };
 
 function buildCardHTML(m, docId) {
-  const hasPhoto = !!m.photoURL;
+  const rawURL = m.photoURL || '';
+  const photoURL = rawURL && !rawURL.startsWith('http') ? '/' + rawURL : rawURL;
+  const hasPhoto = !!photoURL;
   const fallback = m.placeholderEmoji || '🎓';
   const avatarContent = hasPhoto
-    ? `<img src="${m.photoURL}" alt="${m.name}" onerror="this.parentElement.innerHTML='${fallback}';">`
+    ? `<img src="${photoURL}" alt="${m.name}" onerror="this.parentElement.innerHTML='${fallback}';">`
     : fallback;
 
   const nicknameHTML = m.nickname ? `<p class="member-nickname">${m.nickname}</p>` : '';
