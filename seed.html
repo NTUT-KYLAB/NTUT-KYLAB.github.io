@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>Firestore Seed</title>
+  <style>
+    body { font-family: monospace; padding: 24px; background: #0f0f0f; color: #e0e0e0; }
+    h2 { color: #64D2D6; }
+    .log { margin: 4px 0; }
+    .ok { color: #68D391; }
+    .err { color: #FC8181; }
+    button { margin-top: 16px; padding: 12px 24px; background: #64D2D6; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: bold; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <h2>🌱 Firestore Member Seed</h2>
+  <p>點下方按鈕，自動把所有成員資料寫入 Firestore。<br>每筆成功會顯示 ✅，失敗顯示 ❌。</p>
+  <button id="seedBtn" onclick="runSeed()">開始填入資料</button>
+  <div id="log" style="margin-top:20px;"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
+import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBVc5KJl_ZRwriC56yvQsCsQ7NEOXxkvIQ",
+  authDomain: "kylab-ntut.firebaseapp.com",
+  projectId: "kylab-ntut",
+  storageBucket: "kylab-ntut.firebasestorage.app",
+  messagingSenderId: "556294864349",
+  appId: "1:556294864349:web:2653f4e64e0b846da04a34"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const members = [
+  {
+    id: 'linpinwen',
+    name: '林品雯', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩一', researchTag: '🚁 無人機',
+    bio: '大家好，我喜歡出去玩還有吃大餐，都可以揪我，請大家多多指教。',
+    photoURL: 'images/members/linpinwen.jpg', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'cyan', order: 1, customTags: []
+  },
+  {
+    id: 'melvin',
+    name: '郭傲羲', nickname: 'Melvin', role: '碩士生 · Master\'s Student',
+    year: '碩一', researchTag: '🚁 無人機',
+    bio: '喲！我是呱西～ 對拍照、收集小車車、還有對電腦有興趣的可以來交流 OUOb',
+    photoURL: 'images/members/melvin.jpg', placeholderEmoji: '🎓',
+    email: 'melvin0kuo@gmail.com', avatarColor: 'cyan', order: 2, customTags: []
+  },
+  {
+    id: 'liangyinglee',
+    name: '李亮穎', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩一', researchTag: '🚁 無人機',
+    bio: '哈囉，我喜歡看nba比賽，也喜歡益智桌遊可以找我一起看或者玩ㄛ～',
+    photoURL: '', placeholderEmoji: '🚁',
+    email: '', avatarColor: 'purple', order: 3, customTags: []
+  },
+  {
+    id: 'jamie',
+    name: '余依庭', nickname: 'Jamie', role: '碩士生 · Master\'s Student',
+    year: '碩一', researchTag: '🚢 無人船',
+    bio: '嗨嗨！如果有人想跳傘可以揪我，逛酒展也可以 我會到！！！如果有玩石頭也可以交流交流哈哈哈',
+    photoURL: '', placeholderEmoji: '🤿',
+    email: '', avatarColor: 'purple', order: 4, customTags: []
+  },
+  {
+    id: 'chiukailen',
+    name: '邱凱稜', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩一', researchTag: '🚢 無人船',
+    bio: '哈囉！我喜歡可愛的東西還有美食✨有時候很E有時候很I歡迎加入我們🫶🏻',
+    photoURL: 'images/members/chiukailen.jpg', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'purple', order: 5, customTags: []
+  },
+  {
+    id: 'fanyahan',
+    name: '范雅涵', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩一', researchTag: '🚗 自走車',
+    bio: '嗨伊！我喜歡打籃球也喜歡看籃球比賽！追趕跑跳碰的運動都歡迎找我一起玩😍',
+    photoURL: '', placeholderEmoji: '🚗',
+    email: '', avatarColor: 'orange', order: 6, customTags: []
+  },
+  {
+    id: 'lihuixin',
+    name: '李慧芯', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩一', researchTag: '🎙️ 音訊 LLM',
+    bio: '喲！要出去玩可以找我，我不一定會到，但我會認真考慮一下的！',
+    photoURL: '', placeholderEmoji: '🐒',
+    email: '', avatarColor: 'pink', order: 7, customTags: []
+  },
+  {
+    id: 'chenjing',
+    name: '陳靖', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩二', researchTag: '🚗 自走車',
+    bio: '打麻將 唱歌 買盲盒扭蛋的時候記得叫我 目標是每個人桌上都要有一隻我的公仔',
+    photoURL: 'images/members/chenjing.jpg', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'cyan', order: 8, customTags: []
+  },
+  {
+    id: 'liaojunyi',
+    name: '廖俊羿', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩二', researchTag: '🚁 無人機',
+    bio: '', photoURL: 'images/members/liaojunyi.jpg', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'purple', order: 9, customTags: []
+  },
+  {
+    id: 'chenyang',
+    name: '陳揚', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩二', researchTag: '🎙️ 音訊 LLM',
+    bio: '', photoURL: 'images/members/chenyang.jpg', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'orange', order: 10, customTags: []
+  },
+  {
+    id: 'chenyoujun',
+    name: '陳宥均', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩二', researchTag: '🚗 自走車',
+    bio: '', photoURL: '', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'pink', order: 11, customTags: []
+  },
+  {
+    id: 'ouyangxin',
+    name: '歐陽馨', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩二', researchTag: '🚁 無人機',
+    bio: '', photoURL: '', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'cyan', order: 12, customTags: []
+  },
+  {
+    id: 'suqinbang',
+    name: '蘇沁邦', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩二', researchTag: '🚁 無人機',
+    bio: '', photoURL: 'images/members/suqinbang.jpg', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'purple', order: 13, customTags: []
+  },
+  {
+    id: 'luoxinqi',
+    name: '羅欣綺', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩二', researchTag: '🚁 無人機',
+    bio: '', photoURL: '', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'orange', order: 14, customTags: []
+  },
+  {
+    id: 'liuziling',
+    name: '劉姿伶', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩二', researchTag: '🚁 無人機',
+    bio: '', photoURL: '', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'pink', order: 15, customTags: []
+  },
+  {
+    id: 'xieweirui',
+    name: '謝緯睿', nickname: '', role: '碩士生 · Master\'s Student',
+    year: '碩二', researchTag: '🎙️ 音訊 LLM',
+    bio: '', photoURL: '', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'cyan', order: 16, customTags: []
+  },
+  {
+    id: 'phd1',
+    name: '博士班研究生', nickname: '', role: 'Ph.D. Student',
+    year: '博士班', researchTag: '⚡ 節能優化',
+    bio: '', photoURL: '', placeholderEmoji: '🎓',
+    email: '', avatarColor: 'cyan', order: 17, customTags: []
+  },
+];
+
+window.runSeed = async function() {
+  const btn = document.getElementById('seedBtn');
+  const logEl = document.getElementById('log');
+  btn.disabled = true;
+  btn.textContent = '填入中...';
+
+  for (const m of members) {
+    const { id, ...data } = m;
+    try {
+      await setDoc(doc(db, 'members', id), data, { merge: true });
+      logEl.innerHTML += `<div class="log ok">✅ ${id} (${data.name})</div>`;
+    } catch (err) {
+      logEl.innerHTML += `<div class="log err">❌ ${id} — ${err.message}</div>`;
+    }
+  }
+
+  logEl.innerHTML += `<div class="log ok" style="margin-top:12px;font-size:1.1rem;">🎉 完成！可以關掉這個頁面了。</div>`;
+  btn.textContent = '完成';
+};
+</script>
+</body>
+</html>
