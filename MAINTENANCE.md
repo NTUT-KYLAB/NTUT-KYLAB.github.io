@@ -1,154 +1,200 @@
 # 網站維護手冊
 
-本文件說明如何維護與更新 KY Lab 官方網站。
+KY Lab 官方網站維護說明。本站為純靜態網站部署於 GitHub Pages，成員頁面使用 Firebase 動態管理。
 
 ---
 
-## 📁 專案結構
+## 專案結構
 
 ```
 NTUT-KYLAB.github.io/
-├── index.html          ← 主頁面（修改內容在這裡）
+├── index.html              ← 首頁 Hero
+├── research/index.html     ← 研究方向
+├── projects/index.html     ← 實驗室專案
+│   ├── drone/index.html
+│   ├── speech/index.html
+│   ├── vision/index.html
+│   └── energy/index.html
+├── professor/index.html    ← 教授簡介
+├── members/index.html      ← 實驗室成員（Firebase 動態）
+├── awards/index.html       ← 得獎紀錄
+├── gallery/index.html      ← 相簿
 ├── css/
-│   └── style.css       ← 樣式表（修改配色、字體、排版）
+│   ├── style.css           ← 全站樣式（配色變數在 :root）
+│   └── members.css         ← 成員頁專用樣式
 ├── js/
-│   └── main.js         ← 互動效果（滾動動畫、選單）
-├── images/             ← 放圖片的資料夾
-│   ├── hero-bg.jpg     ← Hero 區背景照片（自行加入）
-│   ├── project-01.jpg  ← 專案圖片（自行加入）
-│   └── ...
-├── README.md           ← 專案對外介紹頁面
-└── MAINTENANCE.md      ← 本維護手冊
+│   ├── components.js       ← 共用 Navbar / Footer
+│   ├── main.js             ← 互動效果（無人機游標、滾動動畫）
+│   └── members.js          ← 成員頁 Firebase 邏輯
+├── images/
+│   ├── professor.jpg       ← 教授照片
+│   └── members/            ← 成員預設照片（.jpg）
+├── sitemap.xml
+└── robots.txt
 ```
 
 ---
 
-## 🚀 部署到 GitHub Pages（完整教學）
+## 日常更新流程
 
-### 第一次設定
-
-#### 1. 建立 GitHub 帳號
-- 前往 https://github.com 註冊（免費）
-
-#### 2. 安裝 Git
-- Windows：下載 https://git-scm.com/download/win
-- Mac：終端機輸入 `git --version`，系統會自動提示安裝
-- 安裝完成後，打開終端機設定身份：
-  ```bash
-  git config --global user.name "你的名字"
-  git config --global user.email "你的email@example.com"
-  ```
-
-#### 3. 在 GitHub 建立新 Repository
-1. 登入 GitHub → 右上角 `+` → `New repository`
-2. Repository name 填：`saclab-website`（或任何名稱）
-3. 設為 **Public**
-4. **不要**勾選 "Add a README file"
-5. 點 `Create repository`
-
-#### 4. 上傳網站檔案
-```bash
-# 進入網站資料夾
-cd saclab-website
-
-# 初始化 Git
-git init
-
-# 加入所有檔案
-git add .
-
-# 建立第一個版本
-git commit -m "初始版本：實驗室網站上線"
-
-# 連結到 GitHub（把 YOUR_USERNAME 換成你的帳號）
-git remote add origin https://github.com/YOUR_USERNAME/saclab-website.git
-
-# 推送上去
-git branch -M main
-git push -u origin main
-```
-
-#### 5. 開啟 GitHub Pages
-1. 進入 GitHub 上的 repository 頁面
-2. 點上方 `Settings`
-3. 左側選單找到 `Pages`
-4. Source 選 `Deploy from a branch`
-5. Branch 選 `main`，資料夾選 `/ (root)`
-6. 點 `Save`
-7. 等 1-2 分鐘，網站就會出現在：
-   `https://YOUR_USERNAME.github.io/saclab-website/`
-
----
-
-### 日常更新流程
-
-每次修改完檔案後，只需要三行指令：
+修改任何檔案後，三行指令推上去，GitHub Pages 約 1-2 分鐘自動更新：
 
 ```bash
-git add .
-git commit -m "描述這次改了什麼"
+git add <檔案>
+git commit -m "說明這次改了什麼"
 git push
 ```
 
-GitHub Pages 會自動更新，通常 1-2 分鐘內生效。
-
 ---
 
-## ✏️ 常見修改指南
+## 靜態頁面修改指南
 
-### 修改文字內容
-→ 編輯 `index.html`，找到對應區塊修改即可
+以下頁面內容直接寫在 HTML 裡，用文字編輯器開啟修改即可。
 
-### 修改配色
-→ 編輯 `css/style.css` 最上方的 `:root` 區塊：
+### 新增 / 修改研究方向
+編輯 `research/index.html`，複製現有的卡片區塊並修改文字。
+
+### 新增 / 修改專案
+編輯 `projects/index.html`，或各子頁面（`drone/`、`speech/` 等）的 `index.html`。
+
+### 修改教授資料
+編輯 `professor/index.html`。教授照片路徑為 `/images/professor.jpg`（使用絕對路徑）。
+
+### 新增得獎紀錄
+編輯 `awards/index.html`，複製現有卡片並修改。
+
+### 修改導覽列 / 頁尾
+編輯 `js/components.js`，Navbar 和 Footer 的 HTML 注入在此。新增頁面時也需在這裡加上連結。
+
+### 修改全站配色
+編輯 `css/style.css` 最上方的 `:root` 區塊：
 ```css
 :root {
-  --accent: #3b82f6;      /* 主強調色 */
-  --navy:   #0a1628;      /* 深色背景 */
-  /* ... 其他顏色 ... */
+  --color-cyan:   #64D2D6;
+  --color-purple: #B794F4;
+  --color-orange: #F6AD55;
+  --color-pink:   #F687B3;
 }
 ```
 
-### 新增專案
-→ 在 `index.html` 的 `<!-- PROJECTS -->` 區塊中複製一個 `project-card` 並修改內容
+---
+
+## 成員頁管理（Firebase）
+
+成員資料存放於 Firebase Firestore，登入後可透過頁面上的編輯介面管理，**不需要改程式碼**。
+
+### 登入方式
+前往 `https://kylab-ntut.github.io/members/`，點右上角「🔑 登入」：
+- **Google 帳號登入**：需在一般瀏覽器（Chrome / Safari）開啟，LINE 等 app 內建瀏覽器請改用 Email + 密碼登入
+- **Email + 密碼登入**：適用所有環境
+
+### 每位成員能編輯的欄位
+登入後，自己的卡片右上角會出現 ✏️ 按鈕：
+- 暱稱（英文暱稱）
+- 自我介紹
+- 自訂標籤（最多 5 個）
+- 頭貼照片
+
+### 管理員額外功能
+管理員帳號可以編輯**所有人**的卡片，並多出以下欄位：
+- 姓名、役職、年級、研究標籤、頭像色環
+- 登入 Email、排序順序
+
+**目前管理員 Email** 寫在 `js/members.js` 第 21 行：
+```js
+const ADMIN_EMAIL = 'melvin0kuo@gmail.com';
+```
 
 ### 新增成員
-→ 在 `<!-- TEAM -->` 區塊中複製一個 `team-card` 並修改
+1. 在 [Firebase Console](https://console.firebase.google.com/) → `kylab-ntut` → **Firestore Database** → `members` collection
+2. 新增一筆文件，欄位如下：
 
-### 加入實際照片
-1. 將照片放入 `images/` 資料夾
-2. 在 HTML 中取消對應的 `<img>` 註解，例如：
-   ```html
-   <!-- 原本 -->
-   <!-- <img src="images/project-01.jpg" alt="..."> -->
-   
-   <!-- 改成 -->
-   <img src="images/project-01.jpg" alt="無人機專案">
-   ```
+| 欄位 | 說明 | 範例 |
+|---|---|---|
+| `name` | 姓名 | `王小明` |
+| `role` | 役職 | `碩士生 · Master's Student` |
+| `year` | 年級 | `碩一` / `碩二` / `博士班` |
+| `email` | 登入用 Gmail | `student@gmail.com` |
+| `researchTag` | 預設標籤 | `🚁 無人機` |
+| `avatarColor` | 色環顏色 | `cyan` / `purple` / `orange` / `pink` |
+| `order` | 排列順序（數字越小越前面） | `5` |
+| `photoURL` | 頭貼路徑或 URL（選填） | `images/members/name.jpg` |
+| `placeholderEmoji` | 無照片時的替代 emoji（選填） | `🎓` |
 
-### 使用自訂域名（選用）
-1. 在 repository 根目錄新增 `CNAME` 檔案，內容為你的域名：
-   ```
-   lab.example.com
-   ```
-2. 在你的 DNS 設定中加入 CNAME 記錄指向 `YOUR_USERNAME.github.io`
-3. GitHub Pages Settings 中填入 Custom domain
+3. 成員第一次用 Google 帳號登入時，系統會自動寄一封**密碼設定信**到他的 Gmail，讓他設好密碼後也能用 Email 登入
 
----
-
-## 👥 多人協作
-
-### 加入協作者
-1. Repository → Settings → Collaborators
-2. 點 `Add people` → 輸入對方的 GitHub 帳號
-3. 對方接受邀請後就能推送更新
-
-### 建議工作流程
-- 每次修改前先 `git pull`（拉取最新版本）
-- 修改完再 `git add . → git commit → git push`
-- 如果遇到衝突，Git 會提示你手動解決
+### 移除成員
+在 Firebase Console → Firestore → `members` → 找到該文件 → 刪除。
 
 ---
 
-## 📝 授權
-MIT License — 可自由使用與修改
+## Firebase 專案交接
+
+### 需要移交的項目
+
+#### 1. Firebase / Google Cloud 擁有權
+1. 開 [console.cloud.google.com](https://console.cloud.google.com/) → 選 `kylab-ntut` 專案
+2. 左側 **IAM & Admin** → 新增新管理員的 Gmail，角色設為 `Owner`
+3. 確認新管理員能正常登入後，再移除舊帳號的權限
+
+#### 2. 修改程式碼裡的管理員 Email
+編輯 `js/members.js` 第 21 行：
+```js
+const ADMIN_EMAIL = '新管理員的gmail@gmail.com';
+```
+修改後 commit + push 即可。
+
+#### 3. 確認新管理員有 Firestore 成員資料
+新管理員的 Gmail 必須在 Firestore `members` collection 裡有對應文件（`email` 欄位需吻合），否則登入後會被擋掉。
+
+#### 4. GitHub Organization 管理員
+前往 [github.com/KYLAB-NTUT](https://github.com/KYLAB-NTUT) → Settings → Members：
+- 將新管理員升為 `Owner`
+- 舊管理員降為 `Member` 或移除
+
+### 交接完成確認清單
+- [ ] Google Cloud IAM 已新增新 Owner
+- [ ] `ADMIN_EMAIL` 已改為新管理員 Email 並 push
+- [ ] 新管理員在 Firestore `members` 有對應文件
+- [ ] 新管理員能成功登入網站並看到 👑 標誌
+- [ ] GitHub Organization Owner 已轉移
+
+---
+
+## Google 搜尋 / SEO
+
+- **Sitemap**：`https://kylab-ntut.github.io/sitemap.xml`（已設定於 `robots.txt`）
+- **Google Search Console**：已驗證，可至 [search.google.com/search-console](https://search.google.com/search-console/) 提交 Sitemap 或請求重新索引
+- 各頁面已設有 `<link rel="canonical">` 指向正確網址
+
+新增頁面後，記得在 `sitemap.xml` 加入對應的 `<url>` 條目。
+
+---
+
+## Firebase 費用說明
+
+目前使用 Firebase **免費方案（Spark）**，對實驗室網站流量綽綽有餘：
+
+| 資源 | 免費額度 | 預估用量 |
+|---|---|---|
+| Firestore 讀取 | 50,000 次/天 | ~1,000 次/天 |
+| Firestore 寫入 | 20,000 次/天 | 偶爾管理員操作 |
+| Firebase Storage | 5 GB 儲存 / 1 GB 下載/天 | 頭貼照片 < 100 MB |
+
+除非網站流量暴增（超過 ~5,000 訪客/天），否則不會產生費用。
+
+---
+
+## 常見問題
+
+**Q：推送後網站沒有更新？**
+等 1-2 分鐘，或到 GitHub → repository → Actions 確認部署狀態。
+
+**Q：成員無法用 Google 登入（出現「已封鎖」）？**
+該使用者是從 LINE / Instagram 等 app 內建瀏覽器開啟，請複製網址到 Chrome 或 Safari 再登入，或改用 Email + 密碼。
+
+**Q：新成員登入後顯示「不在成員名單中」？**
+先在 Firebase Console → Firestore → `members` 新增該成員的資料（`email` 欄位需填正確 Gmail）。
+
+**Q：頭貼沒有顯示？**
+確認 `photoURL` 填的是絕對路徑（如 `/images/members/name.jpg`）或完整的 https:// URL。
