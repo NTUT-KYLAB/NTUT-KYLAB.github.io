@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js';
 import { getFirestore, collection, getDocs, doc, updateDoc, query, where } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js';
-import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js';
 
 const firebaseConfig = {
@@ -227,8 +227,17 @@ function closeLoginModal() {
 
 async function handleGoogleLogin() {
   try {
-    await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
     closeLoginModal();
+    const hasPassword = result.user.providerData.some(p => p.providerId === 'password');
+    if (!hasPassword) {
+      try {
+        await sendPasswordResetEmail(auth, result.user.email);
+        showToast(`已寄送密碼設定信至 ${result.user.email}，設定後可用 Email 登入`, 'success');
+      } catch {
+        // 非關鍵，不打擾用戶
+      }
+    }
   } catch (err) {
     const errEl = document.getElementById('login-error');
     if (err.message?.includes('disallowed_useragent') || err.code === 'auth/operation-not-supported-in-this-environment') {
