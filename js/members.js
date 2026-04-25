@@ -55,9 +55,14 @@ function buildCardHTML(m, docId) {
   const customTagsHTML = (m.customTags || []).map(t => `<span class="research-tag">${t}</span>`).join('');
   const bioHTML = m.bio ? `<p class="member-bio">${m.bio}</p>` : '';
 
+  const avatarWrapId = docId === 'melvin' ? ' id="melvin-avatar-wrap"' : '';
+  const avatarWrapData = hasPhoto
+    ? ` data-avatar-url="${photoURL}" data-avatar-color="${m.avatarColor || 'cyan'}" data-avatar-name="${m.name}"`
+    : '';
+
   return `
     <div class="team-card member-card reveal active card-hover" data-member-id="${docId}">
-      <div class="team-avatar-wrap"${docId === 'melvin' ? ' id="melvin-avatar-wrap"' : ''}>
+      <div class="team-avatar-wrap${hasPhoto ? ' has-photo' : ''}"${avatarWrapId}${avatarWrapData}>
         <div class="team-avatar avatar-placeholder">${avatarContent}</div>
         <div class="avatar-ring ${m.avatarColor || 'cyan'}"></div>
       </div>
@@ -641,6 +646,30 @@ function injectModals() {
   document.getElementById('photo-file-input').addEventListener('change', handlePhotoSelect);
   document.getElementById('edit-modal').addEventListener('click', e => {
     if (e.target.id === 'edit-modal') closeEditModal();
+  });
+
+  // Avatar lightbox
+  document.body.insertAdjacentHTML('beforeend', `
+    <div class="avatar-lightbox hidden" id="avatar-lightbox">
+      <div class="avatar-lightbox-inner">
+        <img id="avatar-lightbox-img" src="" alt="">
+        <p id="avatar-lightbox-name"></p>
+      </div>
+    </div>
+  `);
+  document.getElementById('members-grid').addEventListener('click', e => {
+    const wrap = e.target.closest('[data-avatar-url]');
+    if (!wrap) return;
+    const img = document.getElementById('avatar-lightbox-img');
+    img.src = wrap.dataset.avatarUrl;
+    img.alt = wrap.dataset.avatarName || '';
+    img.style.borderColor = `var(--color-${wrap.dataset.avatarColor || 'cyan'})`;
+    document.getElementById('avatar-lightbox-name').textContent = wrap.dataset.avatarName || '';
+    document.getElementById('avatar-lightbox').classList.remove('hidden');
+  });
+  document.getElementById('avatar-lightbox').addEventListener('click', () => {
+    document.getElementById('avatar-lightbox').classList.add('hidden');
+    document.getElementById('avatar-lightbox-img').src = '';
   });
 }
 
