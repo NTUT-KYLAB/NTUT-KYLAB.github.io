@@ -18,11 +18,21 @@ const auth = getAuth(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 
+const ADMIN_EMAIL = 'melvin0kuo@gmail.com';
+
 // ── STATE ──
 let currentMemberId = null;
 let currentMemberData = null;
+let allMembersMap = {};       // id → data (full cache)
+let editingMemberId = null;   // which card is open in modal
 let pendingPhotoBlob = null;
 let editTags = [];
+
+// ── HELPERS ──
+
+function isAdmin() {
+  return currentMemberData?.email === ADMIN_EMAIL;
+}
 
 // ── CARD RENDERING ──
 
@@ -65,9 +75,11 @@ function renderMembers(members) {
   const grid = document.getElementById('members-grid');
   if (!grid) return;
 
+  allMembersMap = {};
   const groups = {};
   const yearOrder = [];
   for (const { data, id } of members) {
+    allMembersMap[id] = data;
     if (!groups[data.year]) { groups[data.year] = []; yearOrder.push(data.year); }
     groups[data.year].push({ data, id });
   }
@@ -93,21 +105,12 @@ async function loadMembers() {
       .map(d => ({ id: d.id, data: d.data() }))
       .sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
     renderMembers(members);
-    if (currentMemberId) addEditButton(currentMemberId);
+    addEditButtonsForCurrentUser();
   } catch (err) {
     console.error('loadMembers failed:', err);
     const grid = document.getElementById('members-grid');
     if (grid) grid.innerHTML = `<p style="padding:40px;color:var(--text-muted)">載入失敗：${err.message}</p>`;
   }
-}
-
-function initRevealAnimation() {
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
-    });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.reveal:not(.visible)').forEach(el => obs.observe(el));
 }
 
 // ── TOAST ──
@@ -131,6 +134,15 @@ function showToast(message, type = 'success') {
 
 // ── AUTH UI ──
 
+function addEditButtonsForCurrentUser() {
+  if (!currentMemberId) return;
+  if (isAdmin()) {
+    Object.keys(allMembersMap).forEach(id => addEditButton(id));
+  } else {
+    addEditButton(currentMemberId);
+  }
+}
+
 function updateNavAuth(user) {
   const navAuth = document.getElementById('nav-auth');
   if (!navAuth) return;
@@ -145,15 +157,18 @@ function updateNavAuth(user) {
   const avatarHTML = currentMemberData?.photoURL
     ? `<img src="${currentMemberData.photoURL}" class="nav-user-avatar" alt="avatar" onerror="this.style.display='none'">`
     : '';
+  const label = isAdmin()
+    ? `${currentMemberData?.nickname || currentMemberData?.name || user.email} 👑`
+    : (currentMemberData?.nickname || currentMemberData?.name || user.email);
   navAuth.innerHTML = `
     <div class="nav-user">
       ${avatarHTML}
-      <span>${currentMemberData?.nickname || currentMemberData?.name || user.email}</span>
+      <span>${label}</span>
       <button class="nav-logout-btn" id="logout-btn">登出</button>
     </div>
   `;
   document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
-  if (currentMemberId) addEditButton(currentMemberId);
+  addEditButtonsForCurrentUser();
 }
 
 function addEditButton(memberId) {
@@ -318,13 +333,19 @@ function updateCharCount(inputId, countId, max) {
 }
 
 function openEditModal(memberId) {
-  const m = currentMemberData;
+  editingMemberId = memberId;
+  const m = allMembersMap[memberId];
   if (!m) return;
 
+  const admin = isAdmin();
+
+  // Photo preview
   const preview = document.getElementById('edit-photo-preview');
-  if (m.photoURL) { preview.src = m.photoURL; preview.style.display = 'block'; }
+  const photoURL = m.photoURL && !m.photoURL.startsWith('http') ? '/' + m.photoURL : m.photoURL;
+  if (photoURL) { preview.src = photoURL; preview.style.display = 'block'; }
   else { preview.src = ''; preview.style.display = 'none'; }
 
+  // Common fields
   document.getElementById('edit-nickname-input').value = m.nickname || '';
   document.getElementById('edit-bio-input').value = m.bio || '';
   updateCharCount('edit-bio-input', 'bio-char-count', 200);
@@ -335,9 +356,27 @@ function openEditModal(memberId) {
   setupTagInput();
   pendingPhotoBlob = null;
 
+  // Admin-only fields
+  const adminSection = document.getElementById('admin-fields');
+  adminSection.style.display = admin ? 'block' : 'none';
+  if (admin) {
+    document.getElementById('edit-name-input').value = m.name || '';
+    document.getElementById('edit-role-input').value = m.role || '';
+    document.getElementById('edit-year-select').value = m.year || '碩一';
+    document.getElementById('edit-research-tag-input').value = m.researchTag || '';
+    document.getElementById('edit-avatar-color-select').value = m.avatarColor || 'cyan';
+    document.getElementById('edit-email-input').value = m.email || '';
+    document.getElementById('edit-order-input').value = m.order ?? '';
+    document.getElementById('edit-modal-title').textContent =
+      memberId === currentMemberId ? '編輯個人資料 👑' : `編輯：${m.name} 👑`;
+  } else {
+    document.getElementById('edit-modal-title').textContent = '編輯個人資料';
+  }
+
   const restoreBtn = document.getElementById('restore-photo-btn');
   restoreBtn.style.display = m.previousPhotoURL ? 'block' : 'none';
   restoreBtn.textContent = '↩️ 還原上一張頭貼';
+
   document.getElementById('edit-modal').classList.remove('hidden');
 }
 
@@ -345,6 +384,7 @@ function closeEditModal() {
   document.getElementById('edit-modal').classList.add('hidden');
   document.getElementById('restore-photo-btn').style.display = 'none';
   pendingPhotoBlob = null;
+  editingMemberId = null;
 }
 
 async function handlePhotoSelect(e) {
@@ -365,6 +405,10 @@ async function saveProfile() {
   saveBtn.disabled = true;
   saveBtn.textContent = '儲存中…';
 
+  const targetId = editingMemberId;
+  const targetData = allMembersMap[targetId];
+  const admin = isAdmin();
+
   try {
     const nickname = document.getElementById('edit-nickname-input').value.trim().slice(0, 30);
     const bio = document.getElementById('edit-bio-input').value.trim().slice(0, 200);
@@ -372,23 +416,40 @@ async function saveProfile() {
 
     const updates = { nickname, bio, customTags: editTags };
 
+    // Admin-only fields
+    if (admin) {
+      updates.name = document.getElementById('edit-name-input').value.trim();
+      updates.role = document.getElementById('edit-role-input').value.trim();
+      updates.year = document.getElementById('edit-year-select').value;
+      updates.researchTag = document.getElementById('edit-research-tag-input').value.trim();
+      updates.avatarColor = document.getElementById('edit-avatar-color-select').value;
+      updates.email = document.getElementById('edit-email-input').value.trim();
+      const orderVal = parseInt(document.getElementById('edit-order-input').value);
+      if (!isNaN(orderVal)) updates.order = orderVal;
+    }
+
+    // Photo upload
     if (pendingPhotoBlob) {
-      const oldPhotoURL = currentMemberData.photoURL || '';
-      const storageRef = ref(storage, `members/${currentMemberId}/avatar.jpg`);
+      const oldPhotoURL = targetData?.photoURL || '';
+      const storageRef = ref(storage, `members/${targetId}/avatar.jpg`);
       await uploadBytes(storageRef, pendingPhotoBlob, { contentType: 'image/jpeg' });
       updates.photoURL = await getDownloadURL(storageRef);
       if (oldPhotoURL) updates.previousPhotoURL = oldPhotoURL;
     }
 
-    await updateDoc(doc(db, 'members', currentMemberId), updates);
-    currentMemberData = { ...currentMemberData, ...updates };
+    await updateDoc(doc(db, 'members', targetId), updates);
 
-    const card = document.querySelector(`[data-member-id="${currentMemberId}"]`);
+    // Update local cache
+    allMembersMap[targetId] = { ...allMembersMap[targetId], ...updates };
+    if (targetId === currentMemberId) {
+      currentMemberData = { ...currentMemberData, ...updates };
+    }
+
+    // Re-render the card
+    const card = document.querySelector(`[data-member-id="${targetId}"]`);
     if (card) {
-      const editBtn = card.querySelector('.edit-profile-btn');
-      card.outerHTML = buildCardHTML(currentMemberData, currentMemberId);
-      const newCard = document.querySelector(`[data-member-id="${currentMemberId}"]`);
-      if (newCard && editBtn) newCard.appendChild(editBtn);
+      card.outerHTML = buildCardHTML(allMembersMap[targetId], targetId);
+      addEditButton(targetId);
     }
 
     updateNavAuth(auth.currentUser);
@@ -438,7 +499,7 @@ function injectModals() {
     <div class="modal-overlay hidden" id="edit-modal">
       <div class="modal-box">
         <div class="modal-header">
-          <h3>編輯個人資料</h3>
+          <h3 id="edit-modal-title">編輯個人資料</h3>
           <button class="modal-close-btn" id="edit-close-btn">✕</button>
         </div>
         <div class="modal-body">
@@ -471,6 +532,48 @@ function injectModals() {
             </div>
             <p class="tag-hint">每個標籤最多 10 字</p>
           </div>
+
+          <!-- Admin-only fields -->
+          <div id="admin-fields" style="display:none">
+            <div class="admin-fields-divider">👑 管理員欄位</div>
+            <div class="modal-field">
+              <label>姓名</label>
+              <input type="text" id="edit-name-input" placeholder="姓名">
+            </div>
+            <div class="modal-field">
+              <label>役職 / 身份</label>
+              <input type="text" id="edit-role-input" placeholder="碩士生 · Master's Student">
+            </div>
+            <div class="modal-field">
+              <label>年級</label>
+              <select id="edit-year-select" class="modal-select">
+                <option value="碩一">碩一</option>
+                <option value="碩二">碩二</option>
+                <option value="博士班">博士班</option>
+              </select>
+            </div>
+            <div class="modal-field">
+              <label>研究標籤（預設）</label>
+              <input type="text" id="edit-research-tag-input" placeholder="🚁 無人機">
+            </div>
+            <div class="modal-field">
+              <label>頭像色環</label>
+              <select id="edit-avatar-color-select" class="modal-select">
+                <option value="cyan">Cyan（青）</option>
+                <option value="purple">Purple（紫）</option>
+                <option value="orange">Orange（橘）</option>
+                <option value="pink">Pink（粉）</option>
+              </select>
+            </div>
+            <div class="modal-field">
+              <label>登入 Email</label>
+              <input type="email" id="edit-email-input" placeholder="member@gmail.com">
+            </div>
+            <div class="modal-field">
+              <label>排序 (order)</label>
+              <input type="number" id="edit-order-input" placeholder="1" min="1">
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button class="btn-secondary" id="edit-cancel-btn">取消</button>
@@ -498,11 +601,13 @@ function injectModals() {
     document.getElementById('photo-file-input').click();
   });
   document.getElementById('restore-photo-btn').addEventListener('click', async () => {
-    const prev = currentMemberData?.previousPhotoURL;
+    const targetId = editingMemberId;
+    const prev = allMembersMap[targetId]?.previousPhotoURL;
     if (!prev) return;
     try {
-      await updateDoc(doc(db, 'members', currentMemberId), { photoURL: prev, previousPhotoURL: '' });
-      currentMemberData = { ...currentMemberData, photoURL: prev, previousPhotoURL: '' };
+      await updateDoc(doc(db, 'members', targetId), { photoURL: prev, previousPhotoURL: '' });
+      allMembersMap[targetId] = { ...allMembersMap[targetId], photoURL: prev, previousPhotoURL: '' };
+      if (targetId === currentMemberId) currentMemberData = { ...currentMemberData, photoURL: prev, previousPhotoURL: '' };
       const preview = document.getElementById('edit-photo-preview');
       preview.src = prev; preview.style.display = 'block';
       pendingPhotoBlob = null;

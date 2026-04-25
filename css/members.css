@@ -151,6 +151,35 @@
 }
 .char-count.over { color: #f56565; }
 
+/* ── Modal select ── */
+.modal-select {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  font-family: inherit;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.modal-select:focus {
+  outline: none;
+  border-color: var(--color-cyan);
+}
+
+/* ── Admin fields divider ── */
+.admin-fields-divider {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-cyan);
+  border-top: 1px solid var(--border-light);
+  padding-top: 14px;
+  margin: 18px 0 14px;
+  letter-spacing: 0.04em;
+}
+
 /* ── Avatar preview ── */
 .avatar-preview-wrap {
   display: flex;
