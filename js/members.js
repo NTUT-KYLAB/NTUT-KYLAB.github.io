@@ -225,7 +225,18 @@ function closeLoginModal() {
   document.getElementById('login-error').textContent = '';
 }
 
+function isWebView() {
+  const ua = navigator.userAgent;
+  return /FBAN|FBAV|Instagram|Line\/|MicroMessenger|wv\)|\.0\.0\.0\)/.test(ua)
+    || (/Android/.test(ua) && /Version\/\d/.test(ua) && !/Chrome/.test(ua));
+}
+
 async function handleGoogleLogin() {
+  if (isWebView()) {
+    document.getElementById('login-error').textContent =
+      '請用 Chrome 或 Safari 開啟本頁後再登入（目前為 app 內建瀏覽器，Google 不允許在此登入）';
+    return;
+  }
   try {
     await signInWithPopup(auth, googleProvider);
     closeLoginModal();
