@@ -301,8 +301,8 @@ nav {
     linear-gradient(to right, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
   background-size: 40px 40px;
   z-index: -2;
-  -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 15%, transparent 72%);
-  mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 15%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse 130% 90% at 50% 50%, black 20%, transparent 68%);
+  mask-image: radial-gradient(ellipse 130% 90% at 50% 50%, black 20%, transparent 68%);
 }
 
 .hero-deco {
