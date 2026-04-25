@@ -225,23 +225,17 @@ function closeLoginModal() {
   document.getElementById('login-error').textContent = '';
 }
 
-function isWebView() {
-  const ua = navigator.userAgent;
-  return /FBAN|FBAV|Instagram|Line\/|MicroMessenger|wv\)|\.0\.0\.0\)/.test(ua)
-    || (/Android/.test(ua) && /Version\/\d/.test(ua) && !/Chrome/.test(ua));
-}
-
 async function handleGoogleLogin() {
-  if (isWebView()) {
-    document.getElementById('login-error').textContent =
-      '請用 Chrome 或 Safari 開啟本頁後再登入（目前為 app 內建瀏覽器，Google 不允許在此登入）';
-    return;
-  }
   try {
     await signInWithPopup(auth, googleProvider);
     closeLoginModal();
   } catch (err) {
-    document.getElementById('login-error').textContent = '登入失敗：' + err.message;
+    const errEl = document.getElementById('login-error');
+    if (err.message?.includes('disallowed_useragent') || err.code === 'auth/operation-not-supported-in-this-environment') {
+      errEl.textContent = '此瀏覽器不支援 Google 登入，請複製網址到 Chrome 或 Safari 開啟後再試';
+    } else {
+      errEl.textContent = '登入失敗：' + err.message;
+    }
   }
 }
 
